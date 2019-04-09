@@ -16,5 +16,6 @@ class State
 };
 
 class Action{
-    
+    map<string, bool> customerConfirm;
+    bool movement;
 }
