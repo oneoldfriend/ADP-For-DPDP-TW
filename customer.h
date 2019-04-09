@@ -1,4 +1,4 @@
-
+#pragma once
 
 class Position
 {
@@ -10,7 +10,10 @@ class Position
     };
 };
 
-class Customers {
+class Customer
+{
+  public:
     Position origin, dest;
     double startTime, endTime, Priority, weight;
+    string id;
 }

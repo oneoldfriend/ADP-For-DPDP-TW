@@ -1,27 +1,34 @@
-#include"customer.h"
-#include<map>
-#include<string>
-#include<vector>
+#pragma once
+#include "customer.h"
+#include "solution.h"
+#include <map>
+#include <string>
+#include <vector>
 
 using namespace std;
 
-
 class State
 {
-    Position currentPosition;
+  public:
+    PointOrder currentPosition;
     double currentTime;
-    map<string, double> customerPriority;
-    vector<Customers> newCustomers;
+    vector<string> unservicedCustomer;
+    vector<string> newCustomers;
     State();
 };
 
-class Action{
-    map<string, bool> customerConfirm;
+class Action
+{
+  public:
+    map<string, bool> customerConfirmation;
     bool movement;
 };
 
-class MDP {
+class MDP
+{
+    Solution solution;
     State currentState;
-    State transition(State S, Action a);
+    void transition(State *S, Action a);
     double reward(State S, Action a);
-}
+    void observation(vector<string> *newCustomers);
+};
