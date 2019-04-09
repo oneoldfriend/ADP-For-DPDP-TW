@@ -18,4 +18,10 @@ class State
 class Action{
     map<string, bool> customerConfirm;
     bool movement;
+};
+
+class MDP {
+    State currentState;
+    State transition(State S, Action a);
+    double reward(State S, Action a);
 }
