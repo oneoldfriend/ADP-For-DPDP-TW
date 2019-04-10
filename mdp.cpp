@@ -46,5 +46,5 @@ void MDP::transition(State *S, Action a)
 
 void MDP::observation(vector<string> *newCustomer)
 {
-    
+    //add new customer into newCustomer and/or update the customer priority(including cancellation)
 }
