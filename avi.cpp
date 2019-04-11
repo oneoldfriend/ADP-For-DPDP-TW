@@ -1,8 +1,9 @@
 #include "avi.h"
 #include "mdp.h"
+#include "vfa.h"
 #include <math.h>
 
-void AVI::approximation()
+void AVI::approximation(ValueFunction *valueFunction)
 {
     int count = 0;
     while (count++ < MAXSIMULATION)
@@ -20,18 +21,14 @@ void AVI::approximation()
                 simulation.currentState.getAction(actionNum, &a);
                 if (simulation.currentState.checkActionFeasibility(a))
                 {
-                    actionValue = simulation.reward(simulation.currentState, a) + this->lookupTable.lookup(simulation.currentState, a);
+                    double immediateReward = simulation.reward(simulation.currentState, a);
+                    actionValue = immediateReward + valueFunction->getValue(simulation.currentState, a, immediateReward);
                     if (actionValue < bestActionValue)
                     {
                         bestActionNum = actionNum;
                     }
                 }
                 actionNum++;
-
-
-                //!!!!!!need to record the partition information for dynamic lookup table
-
-
             }
         }
     }

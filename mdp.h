@@ -7,6 +7,13 @@
 
 using namespace std;
 
+class Action
+{
+  public:
+    map<string, bool> customerConfirmation;
+    bool movement;
+};
+
 class State
 {
   public:
@@ -18,13 +25,6 @@ class State
     void getAction(int actionNum, Action *a);
     void getPostDecisionState(Action a);
     bool checkActionFeasibility(Action a);
-};
-
-class Action
-{
-  public:
-    map<string, bool> customerConfirmation;
-    bool movement;
 };
 
 class MDP
