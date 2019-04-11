@@ -2,6 +2,7 @@
 
 class Position
 {
+  public:
     double x, y;
     Position()
     {
