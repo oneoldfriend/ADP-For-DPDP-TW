@@ -1,21 +1,31 @@
 #pragma once
 #include "mdp.h"
-#include"customer.h"
+#include "customer.h"
+#include "route.h"
 #include <vector>
+#define STEPSIZE 0.1
 
+class Aggregation {
+    public:
+      double currentTime, remainTime;
+      void aggregate(State S, Action a);
+      Aggregation();
+};
 class LookupTable
 {
   public:
-    map<pair<Position, double>, double> value;
-    map<pair<Position, double>, pair<int, vector<double>>> tableInfo;
-    double lookup(Position postDecisionState);
+    map<pair<Aggregation, double>, double> value;
+    map<pair<Aggregation, double>, pair<int, vector<double>>> tableInfo;
+    double lookup(Aggregation postDecisionState);
     void infoUpdate();
-    void partitionUpdate();
+    void partitionUpdate(vector<pair<Aggregation, double>> valueAtThisSimulation);
+    LookupTable();
 };
 class ValueFunction
 {
   public:
     LookupTable lookupTable;
-    double getValue(State S, Action a, double reward);
-    void aggregation(State S, Action a, Position *postDecisionState);
+    double getValue(Aggregation postDecisionState, double reward);
+    void updateValue(vector<pair<Aggregation, double>> valueAtThisSimulation);
+    ValueFunction();
 };

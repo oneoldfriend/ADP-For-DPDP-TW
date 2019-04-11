@@ -13,4 +13,6 @@ void Solver::solve(){
     approximateValueIterate.approximation(&valueFunction);
 
     //online solving
+
+    return;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "customer.h"
+#define MAXWORKTIME 720
 
 typedef class Order *PointOrder;
 typedef class Order *PointOrder;
