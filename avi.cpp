@@ -1,14 +1,12 @@
 #include "avi.h"
-#include "mdp.h"
-#include "vfa.h"
-#include <math.h>
 
 void AVI::approximation(ValueFunction *valueFunction)
 {
+    ifstream trainFile("trainData.txt", ios::in);
     int count = 0;
     while (count++ < MAXSIMULATION)
     {
-        MDP simulation = MDP();
+        MDP simulation = MDP(count);
         vector<pair<Aggregation, double>> valueAtThisSimulation;
         while (!simulation.currentState.notServicedCustomer.empty())
         {

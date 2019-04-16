@@ -38,11 +38,13 @@ Route::Route(bool creatPartial)
     {
         this->head = nullptr;
         this->tail = nullptr;
+        this->currentPos = nullptr;
     }
     else
     {
         this->head = new Order(&(this->depot), true);
         this->tail = new Order(&(this->depot), true);
+        this->currentPos = this->head;
     }
 }
 
