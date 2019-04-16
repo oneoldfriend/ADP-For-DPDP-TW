@@ -2,7 +2,6 @@
 
 void AVI::approximation(ValueFunction *valueFunction)
 {
-    ifstream trainFile("trainData.txt", ios::in);
     int count = 0;
     while (count++ < MAXSIMULATION)
     {
