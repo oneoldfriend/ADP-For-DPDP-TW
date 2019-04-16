@@ -15,6 +15,6 @@ class Customer
 {
   public:
     Position origin, dest;
-    double startTime, endTime, Priority, weight;
+    double startTime, endTime, priority, weight;
     string id;
 }

@@ -20,7 +20,6 @@ class LookupTable
     map<pair<Aggregation, double>, double> value;
     map<pair<Aggregation, double>, pair<int, vector<double>>> tableInfo;
     double lookup(Aggregation postDecisionState);
-    void infoUpdate();
     void partitionUpdate(vector<pair<Aggregation, double>> valueAtThisSimulation);
     void partition(map<pair<Aggregation, double>, double>::iterator tableIter);
     LookupTable();

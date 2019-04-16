@@ -2,49 +2,96 @@
 
 using namespace std;
 
-double MDP::reward(State S, Action a)
-{
-    Route tempPartialRoute = Route();
-    tempPartialRoute.creatPartialRoute(S.currentPosition);
-    double currentCost = tempPartialRoute.cost;
-    Route::greedyInsertion(tempPartialRoute.head, a.customerConfirmation);
-    return tempPartialRoute.cost - currentCost;
+
+void State::getAction(int actionNum, Action *a){
+    int leftOver = actionNum;
+    for (auto confirmIter = a->customerConfirmation.begin(); confirmIter != a->customerConfirmation.end();++confirmIter){
+        confirmIter->second = leftOver % 2;
+        leftOver = leftOver / 2;
+    }
+    a->movement = leftOver % 2;
 }
 
-void MDP::transition(State *S, Action a)
+bool State::checkActionFeasibility(Action a){
+    Route tempPartialRoute = Route(true);
+    tempPartialRoute.creatPartialRoute(this->currentRoute->currentPos);
+    bool feasibility = tempPartialRoute.greedyInsertion(a);
+    tempPartialRoute.deleteRoute();
+    return feasibility;
+}
+
+double MDP::reward(State S, Action a)
 {
-    Route::greedyInsertion(S->currentPosition, a.customerConfirmation);
+    Route tempPartialRoute = Route(true);
+    tempPartialRoute.creatPartialRoute(S.currentRoute->currentPos);
+    double currentCost = tempPartialRoute.cost;
+    tempPartialRoute.greedyInsertion(a);
+    double newCost = tempPartialRoute.cost;
+    tempPartialRoute.deleteRoute();
+    return newCost - currentCost;
+}
+
+void MDP::transition(Action a)
+{
+
+
+    ///!!!!need modified, need to find the next decision point in whole solution, not in one route, and update the currentPos for the route. 
+
+
+
+    this->currentState.currentRoute->greedyInsertion(a);
     for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
     {
         if (iter->second)
         {
-            S->unservicedCustomer.push_back(iter->first);
+            this->currentState.notServicedCustomer.push_back(iter->first->id);
         }
     }
     if (a.movement)
     {
-        if (!S->currentPosition->isOrigin)
+        if (!this->currentState.currentRoute->currentPos->isOrigin)
         {
-            for (auto iter = S->unservicedCustomer.begin(); iter != S->unservicedCustomer.end(); ++iter)
+            for (auto iter = this->currentState.notServicedCustomer.begin(); iter != this->currentState.notServicedCustomer.end(); ++iter)
             {
-                if (*iter == S->currentPosition->customer->id)
+                if (*iter == this->currentState.currentRoute->currentPos->customer->id)
                 {
-                    S->unservicedCustomer.erase(iter);
+                    this->currentState.notServicedCustomer.erase(iter);
                     break;
                 }
             }
         }
-        S->currentPosition = S->currentPosition->next;
-        S->currentTime = S->currentPosition->arrivalTime;
+        this->currentState.currentRoute->currentPos = this->currentState.currentRoute->currentPos->next;
+        this->currentState.currentTime = this->currentState.currentRoute->currentPos->arrivalTime;
     }
     else
     {
-        S->currentTime += 1.0;
+        this->currentState.currentTime += 1.0;
     }
-    this->observation(&S->newCustomers);
+    this->observation();
 }
 
-void MDP::observation(vector<string> *newCustomer)
+void MDP::observation()
 {
-    //add new customer into newCustomer and/or update the customer priority(including cancellation)
+    //read info from files and update the customer and the state
+
+    //update the solution(delete the customers with cancellation)
+
+    for (auto routeIter = this->solution.routes.begin(); routeIter != this->solution.routes.end(); ++routeIter)
+    {
+        PointOrder p = routeIter->currentPos;
+        while (p != nullptr)
+        {
+            if (p->customer->priority == 0)
+            {
+                PointOrder tempPtr = p->next;
+                routeIter->removeOrder(p);
+                p = tempPtr;
+            }
+            else
+            {
+                p = p->next;
+            }
+        }
+        routeIter->routeUpdate();
+    }
 }

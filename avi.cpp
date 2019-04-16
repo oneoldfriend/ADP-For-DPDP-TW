@@ -8,10 +8,9 @@ void AVI::approximation(ValueFunction *valueFunction)
     int count = 0;
     while (count++ < MAXSIMULATION)
     {
-        MDP simulation;
-        simulation.initialize();
+        MDP simulation = MDP();
         vector<pair<Aggregation, double>> valueAtThisSimulation;
-        while (!simulation.currentState.unservicedCustomer.empty())
+        while (!simulation.currentState.notServicedCustomer.empty())
         {
             int actionNum = 0, maxActionNum = pow(2, simulation.currentState.newCustomers.size() + 1), bestActionNum = -1;
             double bestActionValue = MAXVALUE;
@@ -38,7 +37,7 @@ void AVI::approximation(ValueFunction *valueFunction)
             Aggregation postDecisionState;
             postDecisionState.aggregate(simulation.currentState, bestAction);
             valueAtThisSimulation.push_back(make_pair(postDecisionState, simulation.reward(simulation.currentState, bestAction)));
-            simulation.transition(&simulation.currentState, bestAction);
+            simulation.transition(bestAction);
         }
         valueFunction->updateValue(valueAtThisSimulation);
     }

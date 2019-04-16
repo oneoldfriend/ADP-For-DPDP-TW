@@ -10,20 +10,19 @@ using namespace std;
 class Action
 {
   public:
-    map<string, bool> customerConfirmation;
+    map<Customer*, bool> customerConfirmation;
     bool movement;
 };
 
 class State
 {
   public:
-    PointOrder currentPosition;
+    PointRoute currentRoute;
     double currentTime;
-    vector<string> unservicedCustomer;
+    vector<string> notServicedCustomer;
     vector<string> newCustomers;
     State();
     void getAction(int actionNum, Action *a);
-    void getPostDecisionState(Action a);
     bool checkActionFeasibility(Action a);
 };
 
@@ -32,8 +31,9 @@ class MDP
   public:
     Solution solution;
     State currentState;
-    void transition(State *S, Action a);
+    map<string, Customer> customers;
+    void transition(Action a);//!!!
     double reward(State S, Action a);
-    void observation(vector<string> *newCustomers);
-    void initialize();
+    void observation();//!!!
+    MDP();
 };

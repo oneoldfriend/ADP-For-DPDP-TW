@@ -67,12 +67,13 @@ void LookupTable::partition(map<pair<Aggregation, double>, double>::iterator tab
 
 void Aggregation::aggregate(State S, Action a)
 {
-    Route tempPartialRoute = Route();
-    tempPartialRoute.creatPartialRoute(S.currentPosition);
+    Route tempPartialRoute = Route(true);
+    tempPartialRoute.creatPartialRoute(S.currentRoute->currentPos);
     double currentCost = tempPartialRoute.cost;
-    Route::greedyInsertion(tempPartialRoute.head, a.customerConfirmation);
+    tempPartialRoute.greedyInsertion(a);
     this->currentTime = S.currentTime;
     this->remainTime = MAXWORKTIME - tempPartialRoute.tail->departureTime;
+    tempPartialRoute.deleteRoute();
 }
 
 double ValueFunction::getValue(Aggregation postDecisionState, double reward)
