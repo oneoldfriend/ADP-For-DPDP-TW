@@ -1,4 +1,5 @@
 #include "solution.h"
+#include "route.h"
 
 Solution::Solution()
 {
@@ -55,7 +56,7 @@ bool Solution::greedyInsertion(Action a)
             dest->next = bestDestPos.second;
             bestRoute->insertOrder(dest);
             bestRoute->insertOrder(origin);
-            bestRoute->routeUpdate;
+            bestRoute->routeUpdate();
         }
     }
     this->cost = this->calcCost();

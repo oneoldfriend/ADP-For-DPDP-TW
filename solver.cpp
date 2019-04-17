@@ -10,7 +10,7 @@ void Solver::solve()
 
     //online solving
     MDP realShit = MDP("testFile.txt");
-    vector<pair<Aggregation, double>> valueAtThisSimulation;
+    vector<pair<Aggregation, double> > valueAtThisSimulation;
     while (!realShit.currentState.notServicedCustomer.empty())
     {
         int actionNum = 0, maxActionNum = pow(2, realShit.currentState.newCustomers.size()), bestActionNum = -1;

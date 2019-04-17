@@ -5,9 +5,10 @@ void AVI::approximation(ValueFunction *valueFunction)
     int count = 0;
     while (count++ < MAXSIMULATION)
     {
-        string fileName = {char(count / 1000 + 48), char(count % 1000 / 100 + 48),
+        char dayNum[] = {char(count / 1000 + 48), char(count % 1000 / 100 + 48),
                       char(count / 100 + 48), char(count % 100 / 10 + 48), char(count % 10 + 48)};
-        fileName = "TrainingData/" + fileName + ".txt ";
+        string fileName = "TrainingData/";
+        fileName = fileName + +dayNum + ".txt";
         MDP simulation = MDP(fileName);
         vector<pair<Aggregation, double> > valueAtThisSimulation;
         while (!simulation.currentState.notServicedCustomer.empty())

@@ -9,26 +9,48 @@
 
 class Aggregation
 {
-  public:
-    double currentTime, remainTime;
-    void aggregate(State S, Action a);
-    Aggregation();
+public:
+  double currentTime, remainTime;
+  void aggregate(State S, Action a);
+  Aggregation();
 };
+class Entry
+{
+public:
+  double x, y, r;
+  Entry();
+  bool operator<(const Entry &other) const
+  {
+    if (x < other.x)
+    {
+      return true;
+    }
+    else if (x == other.x)
+    {
+      if (y < other.y)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+};
+
 class LookupTable
 {
-  public:
-    map<pair<Aggregation, double>, double> value;
-    map<pair<Aggregation, double>, pair<int, vector<double> > > tableInfo;
-    double lookup(Aggregation postDecisionState);
-    void partitionUpdate(vector<pair<Aggregation, double> > valueAtThisSimulation);
-    void partition(map<pair<Aggregation, double>, double>::iterator tableIter);
-    LookupTable();
+public:
+  map<Entry, double> value;
+  map<Entry, pair<int, vector<double> > > tableInfo;
+  double lookup(Aggregation postDecisionState);
+  void partitionUpdate();
+  void partition(map<Entry, double>::iterator tableIter);
+  LookupTable();
 };
 class ValueFunction
 {
-  public:
-    LookupTable lookupTable;
-    double getValue(Aggregation postDecisionState, double reward);
-    void updateValue(vector<pair<Aggregation, double> > valueAtThisSimulation);
-    ValueFunction();
+public:
+  LookupTable lookupTable;
+  double getValue(Aggregation postDecisionState, double reward);
+  void updateValue(vector<pair<Aggregation, double> > valueAtThisSimulation);
+  ValueFunction();
 };

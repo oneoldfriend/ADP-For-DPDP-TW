@@ -1,10 +1,11 @@
 #pragma once
-#include "route.h"
-#include "mdp.h"
 #include <vector>
 #define MAXVEHICLE 50
 
 using namespace std;
+
+class Action;
+class Route;
 
 class Solution
 {

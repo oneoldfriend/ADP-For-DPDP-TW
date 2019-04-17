@@ -8,7 +8,6 @@
 #define MAXCOST 999999.0
 
 typedef class Order *PointOrder;
-typedef class Order *PointOrder;
 typedef class Route *PointRoute;
 
 class Order
@@ -38,7 +37,7 @@ public:
   bool findBestPosition(PointOrder origin, PointOrder dest, pair<PointOrder, PointOrder> *bestOriginPos, pair<PointOrder, PointOrder> *bestDestPos, double *bestCost);
   void routeCopy(Route source);
   bool checkFeasibility();
-  void deleteRoute();
-  double calcCost();
+  void deleteRoute();//!!!
+  double calcCost();//!!!
   Route(bool createPartial);
 };

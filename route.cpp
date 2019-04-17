@@ -181,7 +181,7 @@ bool Route::findBestPosition(PointOrder origin, PointOrder dest, pair<PointOrder
             dest->prior = destPos;
             dest->next = destPos->next;
             this->insertOrder(dest);
-            this->routeUpdate;
+            this->routeUpdate();
             if (this->checkFeasibility())
             {
                 feasibilityExist = true;
@@ -220,4 +220,12 @@ bool Route::checkFeasibility()
         p = p->next;
     }
     return true;
+}
+
+void Route::deleteRoute()
+{
+}
+
+double Route::calcCost()
+{
 }

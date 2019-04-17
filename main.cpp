@@ -32,7 +32,7 @@ void instanceGenenrator(double trainDayNum)
     int count = 0;
     while (count++ < trainDayNum)
     {
-        list<pair<double, Customer *>> generatedCustomers;
+        list<pair<double, Customer *> > generatedCustomers;
         int customerCount = 0;
         while (customerCount++ < customerNum)
         {
@@ -46,9 +46,10 @@ void instanceGenenrator(double trainDayNum)
             customer->dest.y = customerPosy(e);
             customer->startTime = appearTime + blankLength;
             customer->endTime = customer->startTime + timeWindowLength;
-            customer->weight = ratio(e) * 5.0;
-            customer->id = {char(customerCount / 1000 + 48), char(customerCount % 1000 / 100 + 48),
+            customer->weight = ratio(e) * maxDemand;
+            char idString[] = {char(customerCount / 1000 + 48), char(customerCount % 1000 / 100 + 48),
                             char(customerCount % 100 / 10 + 48), char(customerCount % 10 + 48)};
+            customer->id = idString;
             generatedCustomers.push_back(make_pair(appearTime, customer));
             double isCanceled = ratio(e), isHurry = ratio(e);
             if (isCanceled <= cancellationRatio)
@@ -69,10 +70,11 @@ void instanceGenenrator(double trainDayNum)
             }
         }
         generatedCustomers.sort(sortAscend);
-        string trainData = {char(count / 1000 + 48), char(count % 1000 / 100 + 48),
-                            char(count / 100 + 48), char{count % 100 / 10 + 48}, char(count % 10 + 48)};
-        trainData = "TrainingData/" + trainData + ".txt";
-        ofstream outFile(trainData, ios::out);
+        char dayNum[] = {char(count / 1000 + 48), char(count % 1000 / 100 + 48),
+                      char(count / 100 + 48), char(count % 100 / 10 + 48), char(count % 10 + 48)};
+        string fileName = "TrainingData/";
+        fileName = fileName + +dayNum + ".txt";
+        ofstream outFile(fileName, ios::out);
         for (auto iter = generatedCustomers.begin(); iter != generatedCustomers.end();++iter){
             outFile << iter->first << " ";
             outFile << iter->second->id << " ";
