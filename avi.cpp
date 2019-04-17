@@ -5,11 +5,14 @@ void AVI::approximation(ValueFunction *valueFunction)
     int count = 0;
     while (count++ < MAXSIMULATION)
     {
-        MDP simulation = MDP(count);
-        vector<pair<Aggregation, double>> valueAtThisSimulation;
+        string fileName = {char(count / 1000 + 48), char(count % 1000 / 100 + 48),
+                      char(count / 100 + 48), char(count % 100 / 10 + 48), char(count % 10 + 48)};
+        fileName = "TrainingData/" + fileName + ".txt ";
+        MDP simulation = MDP(fileName);
+        vector<pair<Aggregation, double> > valueAtThisSimulation;
         while (!simulation.currentState.notServicedCustomer.empty())
         {
-            int actionNum = 0, maxActionNum = pow(2, simulation.currentState.newCustomers.size() + 1), bestActionNum = -1;
+            int actionNum = 0, maxActionNum = pow(2, simulation.currentState.newCustomers.size()), bestActionNum = -1;
             double bestActionValue = MAXVALUE;
             Action bestAction;
             while (actionNum < maxActionNum)

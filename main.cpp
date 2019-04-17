@@ -71,7 +71,7 @@ void instanceGenenrator(double trainDayNum)
         generatedCustomers.sort(sortAscend);
         string trainData = {char(count / 1000 + 48), char(count % 1000 / 100 + 48),
                             char(count / 100 + 48), char{count % 100 / 10 + 48}, char(count % 10 + 48)};
-        trainData = "trainData" + trainData + ".txt";
+        trainData = "TrainingData/" + trainData + ".txt";
         ofstream outFile(trainData, ios::out);
         for (auto iter = generatedCustomers.begin(); iter != generatedCustomers.end();++iter){
             outFile << iter->first << " ";

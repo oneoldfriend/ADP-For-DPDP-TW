@@ -38,5 +38,5 @@ public:
   void transition(Action a); //!!!
   double reward(State S, Action a);//!!!
   void observation(double lastDecisionTime);//!!!
-  MDP(int trainDayNum);
+  MDP(string fileName);
 };

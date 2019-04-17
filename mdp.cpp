@@ -27,13 +27,10 @@ bool MDP::checkActionFeasibility(Action a)
     return feasibility;
 }
 
-MDP::MDP(int trainDayNum)
+MDP::MDP(string fileName)
 {
     this->solution = Solution();
-    string num = {char(trainDayNum / 1000 + 48), char(trainDayNum % 1000 / 100 + 48),
-                  char(trainDayNum / 100 + 48), char{trainDayNum % 100 / 10 + 48}, char(trainDayNum % 10 + 48)};
-    num = "trainData" + num + ".txt ";
-    ifstream trainFile(num.c_str(), ios::in);
+    ifstream trainFile(fileName, ios::in);
     double appearTime = 0;
     trainFile >> appearTime;
     while (appearTime != EOF)

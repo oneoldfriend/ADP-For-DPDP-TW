@@ -18,9 +18,9 @@ class LookupTable
 {
   public:
     map<pair<Aggregation, double>, double> value;
-    map<pair<Aggregation, double>, pair<int, vector<double>>> tableInfo;
+    map<pair<Aggregation, double>, pair<int, vector<double> > > tableInfo;
     double lookup(Aggregation postDecisionState);
-    void partitionUpdate(vector<pair<Aggregation, double>> valueAtThisSimulation);
+    void partitionUpdate(vector<pair<Aggregation, double> > valueAtThisSimulation);
     void partition(map<pair<Aggregation, double>, double>::iterator tableIter);
     LookupTable();
 };
@@ -29,6 +29,6 @@ class ValueFunction
   public:
     LookupTable lookupTable;
     double getValue(Aggregation postDecisionState, double reward);
-    void updateValue(vector<pair<Aggregation, double>> valueAtThisSimulation);
+    void updateValue(vector<pair<Aggregation, double> > valueAtThisSimulation);
     ValueFunction();
 };
