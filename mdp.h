@@ -19,13 +19,11 @@ public:
 class State
 {
 public:
-  PointRoute currentRoute;
+  Solution *pointSolution;
   double currentTime;
   vector<string> notServicedCustomer;
   vector<string> newCustomers;
   State();
-  void getAction(int actionNum, Action *a);
-  bool checkActionFeasibility(Action a);
 };
 
 class MDP
@@ -35,8 +33,10 @@ public:
   State currentState;
   list<pair<double, Customer *> > sequenceData;
   map<string, Customer*> customers;
+  bool checkActionFeasibility(Action a);
+  void getAction(int actionNum, Action *a);
   void transition(Action a); //!!!
-  double reward(State S, Action a);
-  void observation(double lastDecisionTime); //!!!
+  double reward(State S, Action a);//!!!
+  void observation(double lastDecisionTime);//!!!
   MDP(int trainDayNum);
 };

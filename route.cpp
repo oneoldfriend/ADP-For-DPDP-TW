@@ -44,6 +44,8 @@ Route::Route(bool creatPartial)
     {
         this->head = new Order(&(this->depot), true);
         this->tail = new Order(&(this->depot), true);
+        this->head->next = this->tail;
+        this->tail->prior = this->head;
         this->currentPos = this->head;
     }
 }
@@ -138,72 +140,68 @@ void Route::creatPartialRoute(PointOrder currentPosition)
     this->tail = pre;
 }
 
-bool Route::greedyInsertion(Action a)
+void Route::routeCopy(Route source)
 {
-    double oldCost = this->cost;
-    if (!a.movement)
+    PointOrder p = source.head;
+    PointOrder targetHead = nullptr, pre = nullptr;
+    while (p != nullptr)
     {
-        this->currentPos->departureTime += UNITTIME;
-        this->currentPos->waitTime += UNITTIME;
-    }
-    this->routeUpdate();
-    if (!this->checkFeasibility())
-    {
-        return false;
-    }
-    for (auto customerIter = a.customerConfirmation.begin(); customerIter != a.customerConfirmation.end(); ++customerIter)
-    {
-        if (customerIter->second)
+        PointOrder order = new Order(p->customer, p->isOrigin);
+        order->infoCopy(p);
+        if (targetHead == nullptr)
+            targetHead = order;
+        else
+            pre->next = order;
+        order->prior = pre;
+        pre = order;
+        p = p->next;
+        if (source.currentPos == p)
         {
-            PointOrder origin = new Order(customerIter->first, true);
-            PointOrder dest = new Order(customerIter->first, false);
-            pair<PointOrder, PointOrder> bestOriginPos;
-            pair<PointOrder, PointOrder> bestDestPos;
-            double bestCost = MAXCOST;
-            PointOrder originPos = this->currentPos;
-            while (originPos != tail)
-            {
-                origin->prior = originPos;
-                origin->next = originPos->next;
-                this->insertOrder(origin);
-                PointOrder destPos = origin;
-                while (destPos != tail)
-                {
-                    dest->prior = destPos;
-                    dest->next = destPos->next;
-                    this->insertOrder(dest);
-                    this->routeUpdate;
-                    if (this->checkFeasibility())
-                    {
-                        if (oldCost - this->cost < bestCost)
-                        {
-                            bestCost = oldCost - this->cost;
-                            bestOriginPos.first = origin->prior;
-                            bestOriginPos.second = origin->next;
-                            bestDestPos.first = dest->prior;
-                            bestDestPos.second = dest->next;
-                        }
-                    }
-                    this->removeOrder(dest);
-                    destPos = destPos->next;
-                }
-                this->removeOrder(origin);
-                originPos = originPos->next;
-            }
-            if (bestCost == MAXCOST)
-            {
-                delete origin;
-                delete dest;
-                return false;
-            }
-            else
-            {
-                this->insertOrder(dest);
-                this->insertOrder(origin);
-                this->routeUpdate();
-            }
+            this->currentPos = order;
         }
     }
+    this->currentPos = targetHead;
+    this->head = targetHead;
+    this->tail = pre;
+}
+
+bool Route::findBestPosition(PointOrder origin, PointOrder dest, pair<PointOrder, PointOrder> *bestOriginPos, pair<PointOrder, PointOrder> *bestDestPos, double *bestCost)
+{
+    double oldCost = this->cost;
+    PointOrder originPos = this->currentPos;
+    bool feasibilityExist = false;
+    while (originPos != tail)
+    {
+        origin->prior = originPos;
+        origin->next = originPos->next;
+        this->insertOrder(origin);
+        PointOrder destPos = origin;
+        while (destPos != tail)
+        {
+            dest->prior = destPos;
+            dest->next = destPos->next;
+            this->insertOrder(dest);
+            this->routeUpdate;
+            if (this->checkFeasibility())
+            {
+                feasibilityExist = true;
+                if (oldCost - this->cost < *bestCost)
+                {
+                    *bestCost = oldCost - this->cost;
+                    bestOriginPos->first = origin->prior;
+                    bestOriginPos->second = origin->next;
+                    bestDestPos->first = dest->prior;
+                    bestDestPos->second = dest->next;
+                }
+            }
+            this->removeOrder(dest);
+            destPos = destPos->next;
+        }
+        this->removeOrder(origin);
+        originPos = originPos->next;
+    }
+    this->routeUpdate();
+    return feasibilityExist;
 }
 
 bool Route::checkFeasibility()

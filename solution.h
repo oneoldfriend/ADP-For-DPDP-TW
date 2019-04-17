@@ -10,6 +10,9 @@ class Solution
   public:
     vector<Route> routes;
     double cost;
-    void initialConstruction(vector<Customer*> initialCustomers);//!!!
+    bool greedyInsertion(Action a);
+    void solutionCopy(Solution *source);
+    void solutionDelete();
+    double calcCost();
     Solution();
 }

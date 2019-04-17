@@ -16,8 +16,8 @@ void AVI::approximation(ValueFunction *valueFunction)
             {
                 Action a;
                 double actionValue = 0;
-                simulation.currentState.getAction(actionNum, &a);
-                if (simulation.currentState.checkActionFeasibility(a))
+                simulation.getAction(actionNum, &a);
+                if (simulation.checkActionFeasibility(a))
                 {
                     double immediateReward = simulation.reward(simulation.currentState, a);
                     Aggregation postDecisionState;
@@ -30,7 +30,7 @@ void AVI::approximation(ValueFunction *valueFunction)
                 }
                 actionNum++;
             }
-            simulation.currentState.getAction(bestActionNum, &bestAction);
+            simulation.getAction(bestActionNum, &bestAction);
             Aggregation postDecisionState;
             postDecisionState.aggregate(simulation.currentState, bestAction);
             valueAtThisSimulation.push_back(make_pair(postDecisionState, simulation.reward(simulation.currentState, bestAction)));

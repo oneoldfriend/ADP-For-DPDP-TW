@@ -5,9 +5,10 @@ using namespace std;
 State::State()
 {
     this->currentTime = 0;
+    this->pointSolution = nullptr;
 }
 
-void State::getAction(int actionNum, Action *a)
+void MDP::getAction(int actionNum, Action *a)
 {
     int leftOver = actionNum;
     for (auto confirmIter = a->customerConfirmation.begin(); confirmIter != a->customerConfirmation.end(); ++confirmIter)
@@ -15,15 +16,14 @@ void State::getAction(int actionNum, Action *a)
         confirmIter->second = leftOver % 2;
         leftOver = leftOver / 2;
     }
-    a->movement = leftOver % 2;
 }
 
-bool State::checkActionFeasibility(Action a)
+bool MDP::checkActionFeasibility(Action a)
 {
-    Route tempPartialRoute = Route(true);
-    tempPartialRoute.creatPartialRoute(this->currentRoute->currentPos);
-    bool feasibility = tempPartialRoute.greedyInsertion(a);
-    tempPartialRoute.deleteRoute();
+    Solution tempSolution = Solution();
+    tempSolution.solutionCopy(&(this->solution));
+    bool feasibility = tempSolution.greedyInsertion(a);
+    tempSolution.solutionDelete();
     return feasibility;
 }
 
@@ -52,27 +52,28 @@ MDP::MDP(int trainDayNum)
     }
     trainFile.close();
     this->currentState = State();
-    vector<Customer *> initialCustomers;
+    Action a = Action();
     for (auto iter = this->sequenceData.begin(); iter != this->sequenceData.end(); ++iter)
     {
         if (iter->first == 0)
         {
             this->customers[iter->second->id] = iter->second;
-            initialCustomers.push_back(iter->second);
+            a.customerConfirmation[iter->second] = true;
             this->currentState.notServicedCustomer.push_back(iter->second->id);
         }
     }
-    this->solution.initialConstruction(initialCustomers);
+    this->solution.greedyInsertion(a);
+    this->currentState.pointSolution = &this->solution;
 }
 
 double MDP::reward(State S, Action a)
 {
-    Route tempPartialRoute = Route(true);
-    tempPartialRoute.creatPartialRoute(S.currentRoute->currentPos);
-    double currentCost = tempPartialRoute.cost;
-    tempPartialRoute.greedyInsertion(a);
-    double newCost = tempPartialRoute.cost;
-    tempPartialRoute.deleteRoute();
+    Solution tempSolution = Solution();
+    tempSolution.solutionCopy(&(this->solution));
+    double currentCost = tempSolution.cost;
+    tempSolution.greedyInsertion(a);
+    double newCost = tempSolution.cost;
+    tempSolution.solutionDelete();
     return newCost - currentCost;
 }
 
@@ -82,7 +83,7 @@ void MDP::transition(Action a)
     ///!!!!need modified, need to find the next decision point in whole solution, not in one route, and update the currentPos for the route.
 
     double lastDecisionTime = this->currentState.currentTime;
-    this->currentState.currentRoute->greedyInsertion(a);
+    this->solution.greedyInsertion(a);
     for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
     {
         if (iter->second)
@@ -90,25 +91,32 @@ void MDP::transition(Action a)
             this->currentState.notServicedCustomer.push_back(iter->first->id);
         }
     }
-    if (a.movement)
+    double newDecisionTime = MAXWORKTIME;
+    for (auto iter = this->solution.routes.begin(); iter != this->solution.routes.end(); ++iter)
     {
-        if (!this->currentState.currentRoute->currentPos->isOrigin)
+        if (iter->head->next == iter->tail)
         {
-            for (auto iter = this->currentState.notServicedCustomer.begin(); iter != this->currentState.notServicedCustomer.end(); ++iter)
+            continue;
+        }
+        else
+        {
+            while (iter->currentPos->arrivalTime <= lastDecisionTime && iter->currentPos != iter->tail)
             {
-                if (*iter == this->currentState.currentRoute->currentPos->customer->id)
-                {
-                    this->currentState.notServicedCustomer.erase(iter);
-                    break;
-                }
+                iter->currentPos = iter->currentPos->next;
+            }
+            if (newDecisionTime > iter->currentPos->arrivalTime)
+            {
+                newDecisionTime = iter->currentPos->arrivalTime;
             }
         }
-        this->currentState.currentRoute->currentPos = this->currentState.currentRoute->currentPos->next;
-        this->currentState.currentTime = this->currentState.currentRoute->currentPos->arrivalTime;
     }
-    else
+    this->currentState.currentTime = newDecisionTime;
+    for (auto iter = this->solution.routes.begin(); iter != this->solution.routes.end(); ++iter)
     {
-        this->currentState.currentTime += 1.0;
+        if (iter->head->next == iter->tail)
+        {
+            iter->head->departureTime = this->currentState.currentTime;
+        }
     }
     this->observation(lastDecisionTime);
 }

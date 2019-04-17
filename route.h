@@ -5,7 +5,7 @@
 #define MAXWORKTIME 720
 #define UNITTIME 1
 #define CAPACITY 10
-#define MAXCOST 999999
+#define MAXCOST 999999.0
 
 typedef class Order *PointOrder;
 typedef class Order *PointOrder;
@@ -35,7 +35,8 @@ public:
   void insertOrder(PointOrder p);
   void removeOrder(PointOrder p);
   void creatPartialRoute(PointOrder currentPosition);
-  bool greedyInsertion(Action a);
+  bool findBestPosition(PointOrder origin, PointOrder dest, pair<PointOrder, PointOrder> *bestOriginPos, pair<PointOrder, PointOrder> *bestDestPos, double *bestCost);
+  void routeCopy(Route source);
   bool checkFeasibility();
   void deleteRoute();
   double calcCost();
