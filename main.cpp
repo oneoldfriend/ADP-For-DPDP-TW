@@ -22,13 +22,13 @@ bool sortAscend(const pair<double, Customer *> a, const pair<double, Customer *>
 
 void instanceGenenrator(double trainDayNum)
 {
+    double shopLocation = 25.0, serviceRange = 20.0;
     default_random_engine e(time(0));
     uniform_real_distribution<double> ratio(0.0, 1.0);
-    uniform_real_distribution<double> shopPosX(-25.0, 25.0);
-    uniform_real_distribution<double> shopPosY(-25.0, 25.0);
+    uniform_real_distribution<double> shopPosX(-shopLocation, shopLocation);
+    uniform_real_distribution<double> shopPosY(-shopLocation, shopLocation);
     int customerNum = 20;
-    double cancellationRatio = 0.1, hurryRatio = 0.4, timeWindowLength = 60.0, blankLength = 10.0,
-           serviceRange = 20.0, maxDemand = 5.0;
+    double cancellationRatio = 0.1, hurryRatio = 0.4, timeWindowLength = (shopLocation + serviceRange), blankLength = 10.0, maxDemand = 5.0;
     int count = 0;
     while (count++ < trainDayNum)
     {

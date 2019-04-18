@@ -2,10 +2,13 @@
 #include "customer.h"
 #include "util.h"
 #include "mdp.h"
-#define MAXWORKTIME 720
+#define MAXWORKTIME 720.0
 #define UNITTIME 1
 #define CAPACITY 10
+#define PENALTYFACTOR 5
 #define MAXCOST 999999.0
+#define MAXEDGE 100.0
+#define CUSTOMERNUMBER 10
 
 typedef class Order *PointOrder;
 typedef class Route *PointRoute;
@@ -37,7 +40,7 @@ public:
   bool findBestPosition(PointOrder origin, PointOrder dest, pair<PointOrder, PointOrder> *bestOriginPos, pair<PointOrder, PointOrder> *bestDestPos, double *bestCost);
   void routeCopy(Route source);
   bool checkFeasibility();
-  void deleteRoute();//!!!
-  double calcCost();//!!!
+  void deleteRoute();
+  double calcCost();
   Route(bool createPartial);
 };

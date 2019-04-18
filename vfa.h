@@ -6,6 +6,7 @@
 #include <vector>
 #define STEPSIZE 0.1
 #define PARTITIONTHRESHOLD 0.5
+#define LOOKUPTABLEINITIAL 10.0
 
 class Aggregation
 {
@@ -17,7 +18,7 @@ public:
 class Entry
 {
 public:
-  double x, y, r;
+  double x, y, xRange, yRange;
   Entry();
   bool operator<(const Entry &other) const
   {

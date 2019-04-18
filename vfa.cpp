@@ -2,16 +2,30 @@
 
 LookupTable::LookupTable()
 {
+    double initialValue = MAXEDGE * double(CUSTOMERNUMBER);
+    double xTick = MAXWORKTIME / LOOKUPTABLEINITIAL, yTick = MAXWORKTIME * double(MAXVEHICLE) / LOOKUPTABLEINITIAL;
+    for (int xCount = 0; xCount > LOOKUPTABLEINITIAL; xCount++)
+    {
+        for (int yCount = 0; yCount < LOOKUPTABLEINITIAL; yCount++)
+        {
+            Entry newEntry;
+            newEntry.x = xTick / 2.0 + xCount * xTick;
+            newEntry.y = yTick / 2.0 + yCount * yTick;
+            newEntry.xRange = xTick;
+            newEntry.yRange = yTick;
+            this->value[newEntry] = initialValue;
+        }
+    }
 }
 
 double LookupTable::lookup(Aggregation postDecisionState)
 {
     for (auto iter = this->value.begin(); iter != this->value.end(); ++iter)
     {
-        if ((postDecisionState.currentTime >= iter->first.x - iter->first.r &&
-             postDecisionState.currentTime < iter->first.x + iter->first.r) &&
-            (postDecisionState.remainTime >= iter->first.x - iter->first.r &&
-             postDecisionState.remainTime < iter->first.x + iter->first.r))
+        if ((postDecisionState.currentTime >= iter->first.x - iter->first.xRange &&
+             postDecisionState.currentTime < iter->first.x + iter->first.xRange) &&
+            (postDecisionState.remainTime >= iter->first.y - iter->first.yRange &&
+             postDecisionState.remainTime < iter->first.y + iter->first.yRange))
         {
             this->tableInfo[iter->first].first = this->tableInfo[iter->first].first + 1;
             return iter->second;
@@ -51,14 +65,14 @@ void LookupTable::partitionUpdate()
 void LookupTable::partition(map<Entry, double>::iterator tableIter)
 {
     Entry partition1, partition2, partition3, partition4;
-    partition1.x = tableIter->first.x + tableIter->first.r / 2.0;
-    partition1.y = tableIter->first.x + tableIter->first.r / 2.0;
-    partition2.x = tableIter->first.x + tableIter->first.r / 2.0;
-    partition2.y = tableIter->first.y - tableIter->first.r / 2.0;
-    partition3.x = tableIter->first.x - tableIter->first.r / 2.0;
-    partition3.y = tableIter->first.y - tableIter->first.r / 2.0;
-    partition4.x = tableIter->first.x - tableIter->first.r / 2.0;
-    partition4.y = tableIter->first.y + tableIter->first.r / 2.0;
+    partition1.x = tableIter->first.x + tableIter->first.xRange / 2.0;
+    partition1.y = tableIter->first.y + tableIter->first.yRange / 2.0;
+    partition2.x = tableIter->first.x + tableIter->first.xRange / 2.0;
+    partition2.y = tableIter->first.y - tableIter->first.yRange / 2.0;
+    partition3.x = tableIter->first.x - tableIter->first.xRange / 2.0;
+    partition3.y = tableIter->first.y - tableIter->first.yRange / 2.0;
+    partition4.x = tableIter->first.x - tableIter->first.xRange / 2.0;
+    partition4.y = tableIter->first.y + tableIter->first.yRange / 2.0;
     this->value[partition1] = tableIter->second;
     this->value[partition2] = tableIter->second;
     this->value[partition3] = tableIter->second;
@@ -100,7 +114,8 @@ Entry::Entry()
 {
     x = 0.0;
     y = 0.0;
-    r = 0.0;
+    xRange = 0.0;
+    yRange = 0.0;
 }
 
 ValueFunction::ValueFunction()
@@ -119,10 +134,10 @@ void ValueFunction::updateValue(vector<pair<Aggregation, double> > valueAtThisSi
     {
         for (auto tableIter = this->lookupTable.value.begin(); tableIter != this->lookupTable.value.end(); ++tableIter)
         {
-            if ((decisionPoint->first.currentTime >= tableIter->first.x - tableIter->first.r &&
-                 decisionPoint->first.currentTime < tableIter->first.x + tableIter->first.r) &&
-                (decisionPoint->first.remainTime >= tableIter->first.y - tableIter->first.r &&
-                 decisionPoint->first.remainTime < tableIter->first.y + tableIter->first.r))
+            if ((decisionPoint->first.currentTime >= tableIter->first.x - tableIter->first.xRange &&
+                 decisionPoint->first.currentTime < tableIter->first.x + tableIter->first.xRange) &&
+                (decisionPoint->first.remainTime >= tableIter->first.y - tableIter->first.yRange &&
+                 decisionPoint->first.remainTime < tableIter->first.y + tableIter->first.yRange))
             {
                 this->lookupTable.tableInfo[tableIter->first].second.push_back(decisionPoint->second);
                 tableIter->second = (1 - STEPSIZE) * tableIter->second + STEPSIZE * decisionPoint->second;

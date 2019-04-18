@@ -224,8 +224,40 @@ bool Route::checkFeasibility()
 
 void Route::deleteRoute()
 {
+    PointOrder p = this->head;
+    if (p == NULL)
+    {
+        return;
+    }
+    while (p != NULL)
+    {
+        PointOrder temp = p->next;
+        delete p;
+        p = temp;
+    }
 }
 
 double Route::calcCost()
 {
+    double penalty = 0, travelTime = 0, waitTime = 0;
+    PointOrder p = this->head;
+    while (p != nullptr)
+    {
+        if (!p->isOrigin)
+        {
+            if (p->arrivalTime > p->customer->startTime)
+            {
+                penalty += p->customer->priority * PENALTYFACTOR * (p->arrivalTime - p->customer->startTime);
+            }
+            else
+            {
+                waitTime += p->waitTime;
+            }
+        }
+        if (p->next != nullptr)
+        {
+            travelTime += Util::calcTravelTime(p->position, p->next->position);
+        }
+    }
+    return penalty + travelTime + waitTime;
 }
