@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#define MAXVEHICLE 20
+#define MAXVEHICLE 5
 
 using namespace std;
 

@@ -2,7 +2,7 @@
 
 void AVI::approximation(ValueFunction *valueFunction)
 {
-    int totalSimulationCount = 0, instanceNum = 1, simulationPerInstance = 10, instanceCount = 0;
+    int totalSimulationCount = 0, instanceNum = 1, simulationPerInstance = 5, instanceCount = 0;
     while (totalSimulationCount++ < MAXSIMULATION)
     {
         if (instanceCount == simulationPerInstance)
@@ -55,5 +55,9 @@ void AVI::approximation(ValueFunction *valueFunction)
             simulation.transition(bestAction);
         }
         valueFunction->updateValue(valueAtThisSimulation);
+        for (auto iter = valueFunction->lookupTable.value.begin(); iter != valueFunction->lookupTable.value.end(); ++iter)
+        {
+            cout << iter->first.x << " " << iter->first.y << " " << iter->second << endl;
+        }
     }
 }

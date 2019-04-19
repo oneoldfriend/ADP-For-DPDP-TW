@@ -4,7 +4,7 @@
 #include <math.h>
 #include <fstream>
 
-#define MAXSIMULATION 10000
+#define MAXSIMULATION 10
 #define MAXVALUE 10000
 
 class AVI
