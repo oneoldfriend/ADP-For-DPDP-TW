@@ -22,7 +22,7 @@ void MDP::getAction(int actionNum, Action *a)
 bool MDP::checkActionFeasibility(Action a)
 {
     Solution tempSolution = Solution();
-    tempSolution.solutionCopy(&(this->solution));
+    tempSolution.solutionCopy(&this->solution);
     bool feasibility = tempSolution.greedyInsertion(a);
     tempSolution.solutionDelete();
     return feasibility;
@@ -33,9 +33,9 @@ MDP::MDP(string fileName)
     this->solution = Solution();
     ifstream trainFile(fileName, ios::in);
     double appearTime = 0;
-    trainFile >> appearTime;
-    while (appearTime != EOF)
+    while (!trainFile.eof())
     {
+        trainFile >> appearTime;
         Customer *customer = new Customer();
         trainFile >> customer->id;
         trainFile >> customer->origin.x;
@@ -45,19 +45,23 @@ MDP::MDP(string fileName)
         trainFile >> customer->startTime;
         trainFile >> customer->endTime;
         trainFile >> customer->weight;
+        trainFile >> customer->priority;
         this->sequenceData.push_back(make_pair(appearTime, customer));
-        trainFile >> appearTime;
     }
     trainFile.close();
     this->currentState = State();
     Action a = Action();
     for (auto iter = this->sequenceData.begin(); iter != this->sequenceData.end(); ++iter)
     {
-        if (iter->first == 0)
+        if (iter->first == 0.0)
         {
             this->customers[iter->second->id] = iter->second;
             a.customerConfirmation[iter->second] = true;
             this->currentState.notServicedCustomer.push_back(iter->second->id);
+        }
+        else
+        {
+            break;
         }
     }
     this->solution.greedyInsertion(a);
@@ -67,7 +71,7 @@ MDP::MDP(string fileName)
 double MDP::reward(State S, Action a)
 {
     Solution tempSolution = Solution();
-    tempSolution.solutionCopy(&(this->solution));
+    tempSolution.solutionCopy(&this->solution);
     double currentCost = tempSolution.cost;
     tempSolution.greedyInsertion(a);
     double newCost = tempSolution.cost;
@@ -77,9 +81,6 @@ double MDP::reward(State S, Action a)
 
 void MDP::transition(Action a)
 {
-
-    ///!!!!need modified, need to find the next decision point in whole solution, not in one route, and update the currentPos for the route.
-
     double lastDecisionTime = this->currentState.currentTime;
     this->solution.greedyInsertion(a);
     for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
@@ -92,7 +93,7 @@ void MDP::transition(Action a)
     double newDecisionTime = MAXWORKTIME;
     for (auto iter = this->solution.routes.begin(); iter != this->solution.routes.end(); ++iter)
     {
-        if (iter->head->next == iter->tail)
+        if (iter->currentPos->next == iter->tail)
         {
             continue;
         }
@@ -101,6 +102,17 @@ void MDP::transition(Action a)
             while (iter->currentPos->arrivalTime <= lastDecisionTime && iter->currentPos != iter->tail)
             {
                 iter->currentPos = iter->currentPos->next;
+                if (!iter->currentPos->isOrigin)
+                {
+                    for (auto iter2 = this->currentState.notServicedCustomer.begin(); iter2 != this->currentState.notServicedCustomer.end(); ++iter2)
+                    {
+                        if (iter->currentPos->customer->id == *iter2)
+                        {
+                            this->currentState.notServicedCustomer.erase(iter2);
+                            break;
+                        }
+                    }
+                }
             }
             if (newDecisionTime > iter->currentPos->arrivalTime)
             {
@@ -111,9 +123,9 @@ void MDP::transition(Action a)
     this->currentState.currentTime = newDecisionTime;
     for (auto iter = this->solution.routes.begin(); iter != this->solution.routes.end(); ++iter)
     {
-        if (iter->head->next == iter->tail)
+        if (iter->currentPos->next == iter->tail)
         {
-            iter->head->departureTime = this->currentState.currentTime;
+            iter->currentPos->departureTime = this->currentState.currentTime;
         }
     }
     this->observation(lastDecisionTime);
@@ -135,6 +147,10 @@ void MDP::observation(double lastDecisionTime)
                 this->customers[sequenceIter->second->id]->priority = sequenceIter->second->priority;
             }
         }
+        if (sequenceIter->first > this->currentState.currentTime)
+        {
+            break;
+        }
     }
 
     //update the solution(delete the customers with cancellation)
@@ -142,10 +158,12 @@ void MDP::observation(double lastDecisionTime)
     for (auto routeIter = this->solution.routes.begin(); routeIter != this->solution.routes.end(); ++routeIter)
     {
         PointOrder p = routeIter->currentPos;
-        while (p != nullptr)
+        bool cancellation = false;
+        while (p != routeIter->tail)
         {
             if (p->customer->priority == 0)
             {
+                cancellation = true;
                 PointOrder tempPtr = p->next;
                 routeIter->removeOrder(p);
                 p = tempPtr;
@@ -155,6 +173,9 @@ void MDP::observation(double lastDecisionTime)
                 p = p->next;
             }
         }
-        routeIter->routeUpdate();
+        if (cancellation)
+        {
+            routeIter->routeUpdate();
+        }
     }
 }

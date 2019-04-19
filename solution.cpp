@@ -5,8 +5,8 @@ Solution::Solution()
 {
     for (int i = 0; i < MAXVEHICLE; i++)
     {
-        Route route = Route(false);
-        this->routes.push_back(route);
+        PointRoute route = new Route();
+        this->routes.push_back(*route);
     }
     this->cost = 0;
 }
@@ -29,15 +29,18 @@ bool Solution::greedyInsertion(Action a)
         pair<PointOrder, PointOrder> bestOriginPos, bestDestPos;
         PointRoute bestRoute = nullptr;
         double bestCost = MAXCOST;
-        Solution tempSolution;
         for (auto routeIter = this->routes.begin(); routeIter != this->routes.end(); ++routeIter)
         {
             double oldCost = bestCost;
-            if (routeIter->findBestPosition(origin, dest, &bestOriginPos, &bestDestPos, &bestCost))
+            if (routeIter->findBestPosition(origin, dest, &bestCost))
             {
                 feasibility = true;
                 if (oldCost > bestCost)
                 {
+                    bestOriginPos.first = origin->prior;
+                    bestOriginPos.second = origin->next;
+                    bestDestPos.first = dest->prior;
+                    bestDestPos.second = dest->next;
                     bestRoute = &(*routeIter);
                 }
             }
@@ -75,10 +78,9 @@ double Solution::calcCost()
 
 void Solution::solutionCopy(Solution *source)
 {
-    for (auto iter = source->routes.begin(); iter != source->routes.end(); ++iter)
+    for (int i = 0; i < MAXVEHICLE; i++)
     {
-        Route *newCopyRoute = new Route(true);
-        newCopyRoute->routeCopy(*iter);
+        this->routes[i].routeCopy(source->routes[i]);
     }
     this->cost = source->cost;
 }

@@ -2,15 +2,12 @@
 #include "customer.h"
 #include "util.h"
 #include "mdp.h"
-#define MAXWORKTIME 720.0
-#define UNITTIME 1
-#define CAPACITY 10
-#define PENALTYFACTOR 5
-#define MAXCOST 999999.0
-#define MAXEDGE 100.0
-#define CUSTOMERNUMBER 10
+#include <iostream>
+
+using namespace std;
 
 typedef class Order *PointOrder;
+
 typedef class Route *PointRoute;
 
 class Order
@@ -28,7 +25,7 @@ public:
 class Route
 {
 public:
-  Customer depot;
+  Customer *depot;
   PointOrder head;
   PointOrder tail;
   double cost;
@@ -37,10 +34,10 @@ public:
   void insertOrder(PointOrder p);
   void removeOrder(PointOrder p);
   void creatPartialRoute(PointOrder currentPosition);
-  bool findBestPosition(PointOrder origin, PointOrder dest, pair<PointOrder, PointOrder> *bestOriginPos, pair<PointOrder, PointOrder> *bestDestPos, double *bestCost);
+  bool findBestPosition(PointOrder origin, PointOrder dest, double *bestCost);
   void routeCopy(Route source);
   bool checkFeasibility();
   void deleteRoute();
   double calcCost();
-  Route(bool createPartial);
+  Route();
 };

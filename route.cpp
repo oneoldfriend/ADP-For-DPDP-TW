@@ -31,23 +31,15 @@ void Order::infoCopy(PointOrder source)
     this->waitTime = source->waitTime;
 }
 
-Route::Route(bool creatPartial)
+Route::Route()
 {
+    this->depot = new Customer();
     this->cost = 0;
-    if (creatPartial)
-    {
-        this->head = nullptr;
-        this->tail = nullptr;
-        this->currentPos = nullptr;
-    }
-    else
-    {
-        this->head = new Order(&(this->depot), true);
-        this->tail = new Order(&(this->depot), true);
-        this->head->next = this->tail;
-        this->tail->prior = this->head;
-        this->currentPos = this->head;
-    }
+    this->head = new Order(this->depot, true);
+    this->tail = new Order(this->depot, true);
+    this->head->next = this->tail;
+    this->tail->prior = this->head;
+    this->currentPos = this->head;
 }
 
 void Route::routeUpdate()
@@ -142,6 +134,10 @@ void Route::creatPartialRoute(PointOrder currentPosition)
 
 void Route::routeCopy(Route source)
 {
+    delete this->head;
+    delete this->tail;
+    this->head = nullptr;
+    this->tail = nullptr;
     PointOrder p = source.head;
     PointOrder targetHead = nullptr, pre = nullptr;
     while (p != nullptr)
@@ -160,16 +156,17 @@ void Route::routeCopy(Route source)
             this->currentPos = order;
         }
     }
-    this->currentPos = targetHead;
     this->head = targetHead;
     this->tail = pre;
+    this->cost = source.cost;
 }
 
-bool Route::findBestPosition(PointOrder origin, PointOrder dest, pair<PointOrder, PointOrder> *bestOriginPos, pair<PointOrder, PointOrder> *bestDestPos, double *bestCost)
+bool Route::findBestPosition(PointOrder origin, PointOrder dest, double *bestCost)
 {
     double oldCost = this->cost;
     PointOrder originPos = this->currentPos;
     bool feasibilityExist = false;
+    pair<PointOrder, PointOrder> bestOriginPos, bestDestPos;
     while (originPos != tail)
     {
         origin->prior = originPos;
@@ -185,13 +182,13 @@ bool Route::findBestPosition(PointOrder origin, PointOrder dest, pair<PointOrder
             if (this->checkFeasibility())
             {
                 feasibilityExist = true;
-                if (oldCost - this->cost < *bestCost)
+                if (this->cost - oldCost < *bestCost)
                 {
-                    *bestCost = oldCost - this->cost;
-                    bestOriginPos->first = origin->prior;
-                    bestOriginPos->second = origin->next;
-                    bestDestPos->first = dest->prior;
-                    bestDestPos->second = dest->next;
+                    *bestCost = this->cost - oldCost;
+                    bestOriginPos.first = origin->prior;
+                    bestOriginPos.second = origin->next;
+                    bestDestPos.first = dest->prior;
+                    bestDestPos.second = dest->next;
                 }
             }
             this->removeOrder(dest);
@@ -201,6 +198,10 @@ bool Route::findBestPosition(PointOrder origin, PointOrder dest, pair<PointOrder
         originPos = originPos->next;
     }
     this->routeUpdate();
+    origin->prior = bestOriginPos.first;
+    origin->next = bestOriginPos.second;
+    dest->prior = bestDestPos.first;
+    dest->next = bestDestPos.second;
     return feasibilityExist;
 }
 
@@ -225,29 +226,30 @@ bool Route::checkFeasibility()
 void Route::deleteRoute()
 {
     PointOrder p = this->head;
-    if (p == NULL)
+    if (p == nullptr)
     {
         return;
     }
-    while (p != NULL)
+    while (p != nullptr)
     {
         PointOrder temp = p->next;
         delete p;
         p = temp;
     }
+    delete this->depot;
 }
 
 double Route::calcCost()
 {
     double penalty = 0, travelTime = 0, waitTime = 0;
     PointOrder p = this->head;
-    while (p != nullptr)
+    while (p != this->tail)
     {
         if (!p->isOrigin)
         {
-            if (p->arrivalTime > p->customer->startTime)
+            if (p->arrivalTime > p->customer->endTime)
             {
-                penalty += p->customer->priority * PENALTYFACTOR * (p->arrivalTime - p->customer->startTime);
+                penalty += p->customer->priority * PENALTYFACTOR * (p->arrivalTime - p->customer->endTime);
             }
             else
             {
@@ -258,6 +260,7 @@ double Route::calcCost()
         {
             travelTime += Util::calcTravelTime(p->position, p->next->position);
         }
+        p = p->next;
     }
     return penalty + travelTime + waitTime;
 }

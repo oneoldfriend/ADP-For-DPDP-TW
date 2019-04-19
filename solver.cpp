@@ -2,7 +2,7 @@
 
 void Solver::solve()
 {
-    ValueFunction valueFunction;
+    ValueFunction valueFunction = ValueFunction();
 
     //offline approximation
     AVI approximateValueIterate;

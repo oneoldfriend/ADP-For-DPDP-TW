@@ -2,6 +2,7 @@
 #include"route.h"
 #include <math.h>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
