@@ -14,6 +14,7 @@ Solution::Solution()
 bool Solution::greedyInsertion(Action a)
 {
     vector<Customer *> customerToBeInserted;
+    //获得需要插入的顾客信息
     for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
     {
         if (iter->second)
@@ -23,6 +24,7 @@ bool Solution::greedyInsertion(Action a)
     }
     for (auto customerIter = customerToBeInserted.begin(); customerIter != customerToBeInserted.end(); ++customerIter)
     {
+        //找到每个顾客在解中的最优位置进行插入
         bool feasibility = false;
         PointOrder origin = new Order(*customerIter, true);
         PointOrder dest = new Order(*customerIter, false);
@@ -32,8 +34,10 @@ bool Solution::greedyInsertion(Action a)
         for (auto routeIter = this->routes.begin(); routeIter != this->routes.end(); ++routeIter)
         {
             double oldCost = bestCost;
+            //找到顾客在当前路径中的最优位置
             if (routeIter->findBestPosition(origin, dest, &bestCost))
             {
+                //若存在合法位置
                 feasibility = true;
                 if (oldCost > bestCost)
                 {
@@ -47,12 +51,14 @@ bool Solution::greedyInsertion(Action a)
         }
         if (feasibility == false)
         {
+            //若有一个顾客无法在当前解中找到合法位置，则该动作非法，并返回合法性
             delete origin;
             delete dest;
             return feasibility;
         }
         else
         {
+            //否则将插入顾客最优位置
             origin->prior = bestOriginPos.first;
             origin->next = bestOriginPos.second;
             dest->prior = bestDestPos.first;

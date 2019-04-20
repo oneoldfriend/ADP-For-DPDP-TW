@@ -11,6 +11,7 @@ State::State()
 
 void MDP::getAction(int actionNum, Action *a)
 {
+    //根据当前动作号进行二进制转换为具体动作
     int leftOver = actionNum;
     for (auto confirmIter = a->customerConfirmation.begin(); confirmIter != a->customerConfirmation.end(); ++confirmIter)
     {
@@ -22,6 +23,7 @@ void MDP::getAction(int actionNum, Action *a)
 bool MDP::checkActionFeasibility(Action a)
 {
     Solution tempSolution = Solution();
+    //生成当前解的副本并对副本执行动作
     tempSolution.solutionCopy(&this->solution);
     bool feasibility = tempSolution.greedyInsertion(a);
     tempSolution.solutionDelete();
@@ -35,6 +37,7 @@ MDP::MDP(string fileName)
     double appearTime = 0;
     while (!trainFile.eof())
     {
+        //读取instance数据
         trainFile >> appearTime;
         Customer *customer = new Customer();
         trainFile >> customer->id;
@@ -55,6 +58,7 @@ MDP::MDP(string fileName)
     {
         if (iter->first == 0.0)
         {
+            //对提前已知的顾客进行路径规划
             this->customers[iter->second->id] = iter->second;
             a.customerConfirmation[iter->second] = true;
             this->currentState.notServicedCustomer.push_back(iter->second->id);
@@ -70,6 +74,7 @@ MDP::MDP(string fileName)
 
 double MDP::reward(State S, Action a)
 {
+    //复制当前解并对副本执行动作计算立即反馈
     Solution tempSolution = Solution();
     tempSolution.solutionCopy(&this->solution);
     double currentCost = tempSolution.cost;
@@ -81,8 +86,10 @@ double MDP::reward(State S, Action a)
 
 void MDP::transition(Action a)
 {
+    //执行动作
     double lastDecisionTime = this->currentState.currentTime;
     this->solution.greedyInsertion(a);
+    //更新当前状态
     for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
     {
         if (iter->second)
@@ -93,6 +100,7 @@ void MDP::transition(Action a)
     double newDecisionTime = MAXWORKTIME;
     for (auto iter = this->solution.routes.begin(); iter != this->solution.routes.end(); ++iter)
     {
+        //更新当前解中每条路径的当前位置
         if (iter->currentPos->next == iter->tail)
         {
             continue;
@@ -101,9 +109,10 @@ void MDP::transition(Action a)
         {
             while (iter->currentPos->arrivalTime <= lastDecisionTime && iter->currentPos != iter->tail)
             {
-                iter->currentPos = iter->currentPos->next;
+                //若路径当前位置的到达时间小于当前时间
                 if (!iter->currentPos->isOrigin)
                 {
+                    //若当前位置是顾客点，则将当前顾客视为已服务，并更新状态相关信息
                     for (auto iter2 = this->currentState.notServicedCustomer.begin(); iter2 != this->currentState.notServicedCustomer.end(); ++iter2)
                     {
                         if (iter->currentPos->customer->id == *iter2)
@@ -113,9 +122,12 @@ void MDP::transition(Action a)
                         }
                     }
                 }
+                //把当前位置推到下一个不小于当前时间的访问点
+                iter->currentPos = iter->currentPos->next;
             }
             if (newDecisionTime > iter->currentPos->arrivalTime)
             {
+                //寻找新状态的决策时间（即解中最早到达下一个访问点的时间）
                 newDecisionTime = iter->currentPos->arrivalTime;
             }
         }
@@ -123,11 +135,13 @@ void MDP::transition(Action a)
     this->currentState.currentTime = newDecisionTime;
     for (auto iter = this->solution.routes.begin(); iter != this->solution.routes.end(); ++iter)
     {
+        //更新在仓库待命的车辆最早出发时间为当前状态的时间
         if (iter->currentPos->next == iter->tail)
         {
             iter->currentPos->departureTime = this->currentState.currentTime;
         }
     }
+    //观察新顾客信息
     this->observation(lastDecisionTime);
 }
 
@@ -135,15 +149,18 @@ void MDP::observation(double lastDecisionTime)
 {
     for (auto sequenceIter = this->sequenceData.begin(); sequenceIter != this->sequenceData.end(); ++sequenceIter)
     {
+        //找到上次决策时间到当前决策时间中产生的新顾客信息
         if (sequenceIter->first > lastDecisionTime && sequenceIter->first <= this->currentState.currentTime)
         {
             if (sequenceIter->second->priority == 1)
             {
+                //若有新顾客产生，则将其加入到待插入顾客集中
                 this->customers[sequenceIter->second->id] = sequenceIter->second;
                 this->currentState.newCustomers.push_back(sequenceIter->second->id);
             }
             else
             {
+                //若观察到顾客退单或催单，则直接对原有顾客信息进行更新
                 this->customers[sequenceIter->second->id]->priority = sequenceIter->second->priority;
             }
         }
@@ -161,6 +178,7 @@ void MDP::observation(double lastDecisionTime)
         bool cancellation = false;
         while (p != routeIter->tail)
         {
+            //检查若有顾客退单，则将其从解中删除
             if (p->customer->priority == 0)
             {
                 cancellation = true;
@@ -175,6 +193,7 @@ void MDP::observation(double lastDecisionTime)
         }
         if (cancellation)
         {
+            //若有顾客退单导致解的变化，则更新对应路径的信息
             routeIter->routeUpdate();
         }
     }

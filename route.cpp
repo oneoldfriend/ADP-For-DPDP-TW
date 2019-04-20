@@ -44,12 +44,15 @@ Route::Route()
 
 void Route::routeUpdate()
 {
+    //从路径当前位置开始更新
     PointOrder p = this->currentPos->next;
     while (p != nullptr)
     {
+        //计算从前继到达当前位置的时间
         p->arrivalTime = p->prior->departureTime + Util::calcTravelTime(p->prior->position, p->position);
         if (p->arrivalTime < p->customer->startTime)
         {
+            //若提前到达则须等待才可出发
             p->waitTime = p->customer->startTime - p->arrivalTime;
             p->departureTime = p->customer->startTime;
         }
@@ -60,10 +63,12 @@ void Route::routeUpdate()
         }
         if (p->isOrigin)
         {
+            //若当前位置为起点，则进行货物提取
             p->currentWeight = p->prior->currentWeight + p->customer->weight;
         }
         else
         {
+            //否则配送货物
             p->currentWeight = p->prior->currentWeight - p->customer->weight;
         }
         p = p->next;
@@ -169,6 +174,7 @@ bool Route::findBestPosition(PointOrder origin, PointOrder dest, double *bestCos
     pair<PointOrder, PointOrder> bestOriginPos, bestDestPos;
     while (originPos != tail)
     {
+        //从路径当前位置开始遍历
         origin->prior = originPos;
         origin->next = originPos->next;
         this->insertOrder(origin);
@@ -181,6 +187,7 @@ bool Route::findBestPosition(PointOrder origin, PointOrder dest, double *bestCos
             this->routeUpdate();
             if (this->checkFeasibility())
             {
+                //若该位置合法，则记录该位置相关信息
                 feasibilityExist = true;
                 if (this->cost - oldCost < *bestCost)
                 {
@@ -207,6 +214,7 @@ bool Route::findBestPosition(PointOrder origin, PointOrder dest, double *bestCos
 
 bool Route::checkFeasibility()
 {
+    //检查work time constraint 和capacity constraint
     if (this->tail->departureTime > MAXWORKTIME)
     {
         return false;
@@ -247,6 +255,7 @@ double Route::calcCost()
     {
         if (!p->isOrigin)
         {
+            //若当前位置为顾客点，则查看是否迟到并进行相应惩罚
             if (p->arrivalTime > p->customer->endTime)
             {
                 penalty += p->customer->priority * PENALTYFACTOR * (p->arrivalTime - p->customer->endTime);
@@ -256,6 +265,7 @@ double Route::calcCost()
                 waitTime += p->waitTime;
             }
         }
+        //计算路程开销
         if (p->next != nullptr)
         {
             travelTime += Util::calcTravelTime(p->position, p->next->position);
