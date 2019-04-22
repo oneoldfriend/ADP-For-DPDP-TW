@@ -1,7 +1,7 @@
 #pragma once
 #include "customer.h"
 #include "util.h"
-#include "mdp.h"
+#include "avi.h"
 #include <iostream>
 
 using namespace std;
@@ -33,7 +33,6 @@ public:
   void routeUpdate();
   void insertOrder(PointOrder p);
   void removeOrder(PointOrder p);
-  void creatPartialRoute(PointOrder currentPosition);
   bool findBestPosition(PointOrder origin, PointOrder dest, double *bestCost);
   void routeCopy(Route source);
   bool checkFeasibility();

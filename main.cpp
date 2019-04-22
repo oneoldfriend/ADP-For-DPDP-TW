@@ -28,14 +28,14 @@ void instanceGenenrator(double trainDayNum)
     uniform_real_distribution<double> shopPosX(-shopLocation, shopLocation);
     uniform_real_distribution<double> shopPosY(-shopLocation, shopLocation);
     double cancellationRatio = 0.1, hurryRatio = 0.4, timeWindowLength = (shopLocation + serviceRange), blankLength = 10.0, maxDemand = 5.0, DOD = 0.8;
-    int count = 0, customerNum = 20;
-    double staticCustomer = customerNum * (1 - DOD);
+    int count = 0;
+    double staticCustomer = double(CUSTOMERNUMBER) * (1 - DOD);
     while (count++ < trainDayNum)
     {
         list<pair<double, Customer *> > generatedCustomers;
         int customerCount = 0;
         double staticCustomerCount = 0.0;
-        while (customerCount++ < customerNum)
+        while (customerCount++ < CUSTOMERNUMBER)
         {
             Customer *customer = new Customer();
             double appearTime = ratio(e) * (MAXWORKTIME - timeWindowLength - blankLength);
@@ -100,7 +100,7 @@ void instanceGenenrator(double trainDayNum)
 
 int main()
 {
-    //instanceGenenrator(2);
+    //instanceGenenrator(1);
     Solver solver;
     solver.solve();
 }

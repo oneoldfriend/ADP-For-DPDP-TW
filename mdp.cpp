@@ -9,13 +9,20 @@ State::State()
     this->pointSolution = nullptr;
 }
 
-void MDP::getAction(int actionNum, Action *a)
+void MDP::getAction(int actionNum, State S, Action *a)
 {
     //根据当前动作号进行二进制转换为具体动作
     int leftOver = actionNum;
-    for (auto confirmIter = a->customerConfirmation.begin(); confirmIter != a->customerConfirmation.end(); ++confirmIter)
+    for (auto customerIter = S.newCustomers.begin(); customerIter != S.newCustomers.end(); ++customerIter)
     {
-        confirmIter->second = leftOver % 2;
+        if (leftOver % 2 == 1)
+        {
+            a->customerConfirmation[this->customers[*customerIter]] = true;
+        }
+        else
+        {
+            a->customerConfirmation[this->customers[*customerIter]] = false;
+        }
         leftOver = leftOver / 2;
     }
 }
@@ -51,6 +58,7 @@ MDP::MDP(string fileName)
         trainFile >> customer->priority;
         this->sequenceData.push_back(make_pair(appearTime, customer));
     }
+    this->sequenceData.pop_back();
     trainFile.close();
     this->currentState = State();
     Action a = Action();
@@ -81,13 +89,38 @@ double MDP::reward(State S, Action a)
     tempSolution.greedyInsertion(a);
     double newCost = tempSolution.cost;
     tempSolution.solutionDelete();
+    newCost += this->rejectionReward(a);
     return newCost - currentCost;
+}
+
+double MDP::rejectionReward(Action a)
+{
+    double count = 0;
+    for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
+    {
+        if (iter->second == false)
+        {
+            count++;
+        }
+    }
+    return count * MAXWORKTIME;
 }
 
 void MDP::transition(Action a)
 {
     //执行动作
     double lastDecisionTime = this->currentState.currentTime;
+    for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
+    {
+        if (iter->second == false)
+        {
+            cout << "rejected" << iter->first->id << endl;
+        }
+        else
+        {
+            cout << "accept" << iter->first->id << endl;
+        }
+    }
     this->solution.greedyInsertion(a);
     //更新当前状态
     for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
@@ -98,6 +131,7 @@ void MDP::transition(Action a)
         }
     }
     double newDecisionTime = MAXWORKTIME;
+    bool vehicleAllWaiting = true;
     for (auto iter = this->solution.routes.begin(); iter != this->solution.routes.end(); ++iter)
     {
         //更新当前解中每条路径的当前位置
@@ -107,6 +141,7 @@ void MDP::transition(Action a)
         }
         else
         {
+            vehicleAllWaiting = false;
             while (iter->currentPos->arrivalTime <= lastDecisionTime && iter->currentPos != iter->tail)
             {
                 //若路径当前位置的到达时间小于当前时间
@@ -132,13 +167,23 @@ void MDP::transition(Action a)
             }
         }
     }
-    this->currentState.currentTime = newDecisionTime;
+    if (vehicleAllWaiting)
+    {
+        this->currentState.currentTime = lastDecisionTime + TIMEUNIT;
+    }
+    else
+    {
+        this->currentState.currentTime = newDecisionTime;
+    }
     for (auto iter = this->solution.routes.begin(); iter != this->solution.routes.end(); ++iter)
     {
         //更新在仓库待命的车辆最早出发时间为当前状态的时间
         if (iter->currentPos->next == iter->tail)
         {
-            iter->currentPos->departureTime = this->currentState.currentTime;
+            if (iter->currentPos->departureTime < this->currentState.currentTime)
+            {
+                iter->currentPos->departureTime = this->currentState.currentTime;
+            }
         }
     }
     //观察新顾客信息
@@ -147,8 +192,13 @@ void MDP::transition(Action a)
 
 void MDP::observation(double lastDecisionTime)
 {
-    for (auto sequenceIter = this->sequenceData.begin(); sequenceIter != this->sequenceData.end(); ++sequenceIter)
+    this->currentState.newCustomers.clear();
+    for (auto sequenceIter = this->sequenceData.begin(); sequenceIter != this->sequenceData.end();)
     {
+        if (sequenceIter->first > this->currentState.currentTime)
+        {
+            break;
+        }
         //找到上次决策时间到当前决策时间中产生的新顾客信息
         if (sequenceIter->first > lastDecisionTime && sequenceIter->first <= this->currentState.currentTime)
         {
@@ -164,17 +214,14 @@ void MDP::observation(double lastDecisionTime)
                 this->customers[sequenceIter->second->id]->priority = sequenceIter->second->priority;
             }
         }
-        if (sequenceIter->first > this->currentState.currentTime)
-        {
-            break;
-        }
+        this->sequenceData.erase(sequenceIter++);
     }
 
     //update the solution(delete the customers with cancellation)
 
     for (auto routeIter = this->solution.routes.begin(); routeIter != this->solution.routes.end(); ++routeIter)
     {
-        PointOrder p = routeIter->currentPos;
+        PointOrder p = routeIter->currentPos->next;
         bool cancellation = false;
         while (p != routeIter->tail)
         {
@@ -184,6 +231,7 @@ void MDP::observation(double lastDecisionTime)
                 cancellation = true;
                 PointOrder tempPtr = p->next;
                 routeIter->removeOrder(p);
+                delete p;
                 p = tempPtr;
             }
             else

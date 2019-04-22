@@ -5,7 +5,6 @@ LookupTable::LookupTable()
     double initialValue = MAXEDGE * double(CUSTOMERNUMBER);
     double xTick = double(MAXWORKTIME) / double(LOOKUPTABLEINITIAL),
     yTick = double(MAXWORKTIME) * double(MAXVEHICLE) / double(LOOKUPTABLEINITIAL);
-    cout << xTick << " " << yTick << endl;
     for (int xCount = 0; xCount < LOOKUPTABLEINITIAL; xCount++)
     {
         for (int yCount = 0; yCount < LOOKUPTABLEINITIAL; yCount++)

@@ -78,63 +78,14 @@ void Route::routeUpdate()
 
 void Route::removeOrder(PointOrder p)
 {
-    if (p->prior != nullptr)
-    {
-        p->prior->next = p->next;
-    }
-    else
-    {
-        this->head = p->next;
-    }
-    if (p->next != nullptr)
-    {
-        p->next->prior = p->prior;
-    }
-    else
-    {
-        this->tail = p->prior;
-    }
+    p->prior->next = p->next;
+    p->next->prior = p->prior;
 }
 
 void Route::insertOrder(PointOrder p)
 {
-    if (p->prior != nullptr)
-    {
-        p->prior->next = p;
-    }
-    else
-    {
-        this->head = p;
-    }
-    if (p->next != nullptr)
-    {
-        p->next->prior = p;
-    }
-    else
-    {
-        this->tail = p;
-    }
-}
-
-void Route::creatPartialRoute(PointOrder currentPosition)
-{
-    PointOrder p = currentPosition;
-    PointOrder targetHead = nullptr, pre = nullptr;
-    while (p != nullptr)
-    {
-        PointOrder order = new Order(p->customer, p->isOrigin);
-        order->infoCopy(p);
-        if (targetHead == nullptr)
-            targetHead = order;
-        else
-            pre->next = order;
-        order->prior = pre;
-        pre = order;
-        p = p->next;
-    }
-    this->currentPos = targetHead;
-    this->head = targetHead;
-    this->tail = pre;
+    p->prior->next = p;
+    p->next->prior = p;
 }
 
 void Route::routeCopy(Route source)
@@ -155,11 +106,11 @@ void Route::routeCopy(Route source)
             pre->next = order;
         order->prior = pre;
         pre = order;
-        p = p->next;
         if (source.currentPos == p)
         {
             this->currentPos = order;
         }
+        p = p->next;
     }
     this->head = targetHead;
     this->tail = pre;

@@ -1,5 +1,5 @@
 #include "solution.h"
-#include "route.h"
+#include "avi.h"
 
 Solution::Solution()
 {
@@ -51,6 +51,7 @@ bool Solution::greedyInsertion(Action a)
         }
         if (feasibility == false)
         {
+            cout << "非法动作" << endl;
             //若有一个顾客无法在当前解中找到合法位置，则该动作非法，并返回合法性
             delete origin;
             delete dest;
@@ -84,9 +85,11 @@ double Solution::calcCost()
 
 void Solution::solutionCopy(Solution *source)
 {
-    for (int i = 0; i < MAXVEHICLE; i++)
+    auto thisRouteIter = this->routes.begin();
+    auto sourceRouteIter = source->routes.begin();
+    for (; thisRouteIter != this->routes.end(); ++thisRouteIter, ++sourceRouteIter)
     {
-        this->routes[i].routeCopy(source->routes[i]);
+        thisRouteIter->routeCopy(*sourceRouteIter);
     }
     this->cost = source->cost;
 }

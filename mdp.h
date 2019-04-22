@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#define TIMEUNIT 10
 
 using namespace std;
 
@@ -34,9 +35,10 @@ public:
   list<pair<double, Customer *> > sequenceData;
   map<string, Customer*> customers;
   bool checkActionFeasibility(Action a);
-  void getAction(int actionNum, Action *a);
-  void transition(Action a); //!!!
-  double reward(State S, Action a);//!!!
-  void observation(double lastDecisionTime);//!!!
+  void getAction(int actionNum, State S, Action *a);
+  void transition(Action a);
+  double reward(State S, Action a);
+  double rejectionReward(Action a);
+  void observation(double lastDecisionTime);
   MDP(string fileName);
 };
