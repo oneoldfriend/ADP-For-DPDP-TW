@@ -100,7 +100,7 @@ void instanceGenenrator(double trainDayNum)
 
 int main()
 {
-    //instanceGenenrator(1);
+    instanceGenenrator(1);
     Solver solver;
     solver.solve();
 }

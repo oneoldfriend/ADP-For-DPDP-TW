@@ -3,7 +3,8 @@
 void AVI::approximation(ValueFunction *valueFunction)
 {
     //定义计数器，包括总模拟次数和每个instance的模拟次数
-    int totalSimulationCount = 0, instanceNum = 1, simulationPerInstance = 5, instanceCount = 0;
+    int totalSimulationCount = 0, instanceNum = 1, instanceCount = 0;
+    int simulationPerInstance = MAXSIMULATION / MAXINSTANCE;
     while (totalSimulationCount++ < MAXSIMULATION)
     {
         if (instanceCount == simulationPerInstance)
@@ -61,47 +62,11 @@ void AVI::approximation(ValueFunction *valueFunction)
             postDecisionState.aggregate(simulation.currentState, bestAction);
             //记录这次sample path的信息
             valueAtThisSimulation.push_back(make_pair(postDecisionState, simulation.reward(simulation.currentState, bestAction)));
-            /*cout << "current time:" << simulation.currentState.currentTime << endl;
-            for (auto iter = simulation.currentState.newCustomers.begin(); iter != simulation.currentState.newCustomers.end(); ++iter)
-            {
-                cout << "new customer:" << *iter << endl;
-            }
-            for (auto iter = bestAction.customerConfirmation.begin(); iter != bestAction.customerConfirmation.end(); ++iter)
-            {
-                if (iter->second == false)
-                {
-                    cout << "rejected" << iter->first->id << endl;
-                }
-                else
-                {
-                    cout << "accept" << iter->first->id << endl;
-                }
-            }*/
             //状态转移
             simulation.transition(bestAction);
-            for (auto iter = simulation.solution.routes.begin(); iter != simulation.solution.routes.end(); ++iter)
-            {
-                PointOrder p = iter->head;
-                while (p != nullptr)
-                {
-                    cout << p->customer->id << " ";
-                    p = p->next;
-                }
-                cout << endl;
-            }
         }
         //对lookup table 进行更新
         valueFunction->updateValue(valueAtThisSimulation);
-        for (auto iter = simulation.solution.routes.begin(); iter != simulation.solution.routes.end(); ++iter)
-        {
-            PointOrder p = iter->head;
-            while (p != nullptr)
-            {
-                cout << p->customer->id << p->isOrigin << " ";
-                p = p->next;
-            }
-            cout << endl;
-        }
-        return;
+        cout << totalSimulationCount << " " << simulation.solution.cost << endl;
     }
 }

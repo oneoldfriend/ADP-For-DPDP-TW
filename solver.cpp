@@ -3,15 +3,11 @@
 void Solver::solve()
 {
     ValueFunction valueFunction;
-    printf("starting!\n");
+    cout << "starting approximation!\n" << endl;
     //offline approximation
     AVI approximateValueIterate;
     approximateValueIterate.approximation(&valueFunction);
-
-    /*for (auto iter = valueFunction.lookupTable.value.begin(); iter != valueFunction.lookupTable.value.end(); ++iter)
-    {
-        cout << iter->first.x << " " << iter->first.y << " " << iter->second << endl;
-    }*/
+    cout << "finished approximation!\n" << endl;
 
     //online solving
     MDP realShit = MDP("testFile.txt");

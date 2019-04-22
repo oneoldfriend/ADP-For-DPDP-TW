@@ -110,17 +110,6 @@ void MDP::transition(Action a)
 {
     //执行动作
     double lastDecisionTime = this->currentState.currentTime;
-    for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
-    {
-        if (iter->second == false)
-        {
-            cout << "rejected" << iter->first->id << endl;
-        }
-        else
-        {
-            cout << "accept" << iter->first->id << endl;
-        }
-    }
     this->solution.greedyInsertion(a);
     //更新当前状态
     for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
