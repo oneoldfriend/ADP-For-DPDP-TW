@@ -9,6 +9,7 @@ using namespace std;
 class Util
 {
   public:
+    static void infoCopy(Customer *target, Customer *source);
     static double standardDeviation(vector<double> sample);
     static double calcTravelTime(Position a, Position b);
 };
