@@ -26,37 +26,8 @@ void AVI::approximation(ValueFunction *valueFunction)
         //开始mdp模拟
         while (!simulation.sequenceData.empty() || !simulation.currentState.newCustomers.empty())
         {
-            int actionNum = 0, maxActionNum = pow(2, simulation.currentState.newCustomers.size()), bestActionNum = -1;
-            double bestActionValue = MAXCOST;
             Action bestAction;
-            if (simulation.currentState.newCustomers.size() != 0)
-            {
-                //若有新顾客被观察到
-                while (actionNum < maxActionNum)
-                {
-                    //检查每个可能动作的可行性并对可行动作进行评估
-                    Action a;
-                    double actionValue = 0;
-                    simulation.getAction(actionNum, simulation.currentState, &a);
-                    if (simulation.checkActionFeasibility(a))
-                    {
-                        //若动作可行，则计算立即反馈和后续反馈（value）
-                        double immediateReward = simulation.reward(simulation.currentState, a);
-                        Aggregation postDecisionState;
-                        postDecisionState.aggregate(simulation.currentState, a);
-                        actionValue = immediateReward + valueFunction->getValue(postDecisionState, immediateReward);
-                        if (actionValue < bestActionValue)
-                        {
-                            //记录更优的动作
-                            bestActionValue = actionValue;
-                            bestActionNum = actionNum;
-                        }
-                    }
-                    actionNum++;
-                }
-            }
-
-            simulation.getAction(bestActionNum, simulation.currentState, &bestAction);
+            simulation.findBestAction(&bestAction, *valueFunction);
             Aggregation postDecisionState;
             //计算后决策状态以及聚合后的相关信息
             postDecisionState.aggregate(simulation.currentState, bestAction);

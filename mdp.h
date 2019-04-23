@@ -34,8 +34,9 @@ public:
   State currentState;
   list<pair<double, Customer *> > sequenceData;
   map<string, Customer*> customers;
-  bool checkActionFeasibility(Action a);
-  void getAction(int actionNum, State S, Action *a);
+  bool checkActionFeasibility(Action a, double *reward);
+  void findBestAction(Action *a, ValueFunction valueFunction);
+  void integerToAction(int actionNum, State S, Action *a);
   void transition(Action a);
   double reward(State S, Action a);
   double rejectionReward(Action a);

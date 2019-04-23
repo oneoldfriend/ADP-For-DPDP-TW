@@ -9,7 +9,7 @@ State::State()
     this->pointSolution = nullptr;
 }
 
-void MDP::getAction(int actionNum, State S, Action *a)
+void MDP::integerToAction(int actionNum, State S, Action *a)
 {
     //根据当前动作号进行二进制转换为具体动作
     int leftOver = actionNum;
@@ -27,13 +27,50 @@ void MDP::getAction(int actionNum, State S, Action *a)
     }
 }
 
-bool MDP::checkActionFeasibility(Action a)
+void MDP::findBestAction(Action *a, ValueFunction valueFunction)
+{
+    int actionNum = 0, maxActionNum = pow(2, this->currentState.newCustomers.size()), bestActionNum = -1;
+    double bestActionValue = MAXCOST;
+    if (this->currentState.newCustomers.size() != 0)
+    {
+        //若有新顾客被观察到
+        while (actionNum < maxActionNum)
+        {
+            //检查每个可能动作的可行性并对可行动作进行评估
+            Action tempAction;
+            double actionValue = 0;
+            this->integerToAction(actionNum, this->currentState, &tempAction);
+            double immediateReward = 0;
+            if (this->checkActionFeasibility(tempAction, &immediateReward))
+            {
+                //若动作可行，则进行评估
+                Aggregation postDecisionState;
+                postDecisionState.aggregate(this->currentState, tempAction);
+                actionValue = immediateReward + valueFunction.getValue(postDecisionState, immediateReward);
+                if (actionValue < bestActionValue)
+                {
+                    //记录更优的动作
+                    bestActionValue = actionValue;
+                    bestActionNum = actionNum;
+                }
+            }
+            actionNum++;
+        }
+    }
+    this->integerToAction(bestActionNum, this->currentState, a);
+}
+
+bool MDP::checkActionFeasibility(Action a, double *reward)
 {
     Solution tempSolution = Solution();
-    //生成当前解的副本并对副本执行动作
+    //生成当前解的副本并对副本执行动作进行检查计算
     tempSolution.solutionCopy(&this->solution);
+    double currentCost = tempSolution.cost;
     bool feasibility = tempSolution.greedyInsertion(a);
+    double newCost = tempSolution.cost;
     tempSolution.solutionDelete();
+    newCost += this->rejectionReward(a);
+    *reward = newCost - currentCost;
     return feasibility;
 }
 
