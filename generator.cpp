@@ -3,10 +3,6 @@
 #include <random>
 #include <ctime>
 
-
-
-
-
 bool Generator::sortAscend(const pair<double, Customer *> a, const pair<double, Customer *> b)
 {
     return a.first < b.first;
@@ -21,16 +17,16 @@ void Generator::instanceGenenrator(double trainDayNum)
     uniform_real_distribution<double> shopPosY(-shopLocation, shopLocation);
     double cancellationRatio = 0.1, hurryRatio = 0.4, timeWindowLength = (shopLocation + serviceRange), blankLength = 10.0, maxDemand = 5.0, DOD = 0.8;
     int count = 0;
-    double staticCustomer = double(CUSTOMERNUMBER) * (1 - DOD);
+    double staticCustomer = double(CUSTOMER_NUMBER) * (1 - DOD);
     while (count++ < trainDayNum)
     {
         list<pair<double, Customer *> > generatedCustomers;
         int customerCount = 0;
         double staticCustomerCount = 0.0;
-        while (customerCount++ < CUSTOMERNUMBER)
+        while (customerCount++ < CUSTOMER_NUMBER)
         {
             Customer *customer = new Customer();
-            double appearTime = ratio(e) * (MAXWORKTIME - timeWindowLength - blankLength);
+            double appearTime = ratio(e) * (MAX_WORK_TIME - timeWindowLength - blankLength);
             if (staticCustomerCount++ < staticCustomer)
             {
                 appearTime = 0;
@@ -67,9 +63,17 @@ void Generator::instanceGenenrator(double trainDayNum)
             }
         }
         generatedCustomers.sort(sortAscend);
-        char dayNum[] = {char(count / 1000 + 48), char(count % 1000 / 100 + 48),
+        char dayNum[] = {char(count / 10000 + 48), char(count % 10000 / 1000 + 48), char(count % 1000 / 100 + 48),
                          char(count % 100 / 10 + 48), char(count % 10 + 48), '\0'};
-        string fileName = "TrainingData/";
+        string fileName;
+        if (trainDayNum == MAX_TEST_INSTANCE)
+        {
+            fileName = "TestData/";
+        }
+        else
+        {
+            fileName = "TrainingData/";
+        }
         fileName = fileName + dayNum + ".txt";
         ofstream outFile(fileName, ios::out);
         for (auto iter = generatedCustomers.begin(); iter != generatedCustomers.end(); ++iter)

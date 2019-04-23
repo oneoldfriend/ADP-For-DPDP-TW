@@ -4,8 +4,8 @@ void AVI::approximation(ValueFunction *valueFunction)
 {
     //定义计数器，包括总模拟次数和每个instance的模拟次数
     int totalSimulationCount = 0, instanceNum = 1, instanceCount = 0;
-    int simulationPerInstance = MAXSIMULATION / MAXINSTANCE;
-    while (totalSimulationCount++ < MAXSIMULATION)
+    int simulationPerInstance = MAX_SIMULATION / MAX_TRAINING_INSTANCE;
+    while (totalSimulationCount++ < MAX_SIMULATION)
     {
         if (instanceCount == simulationPerInstance)
         {
@@ -14,7 +14,7 @@ void AVI::approximation(ValueFunction *valueFunction)
             instanceNum++;
         }
         instanceCount++;
-        char dayNum[] = {char(instanceNum / 1000 + 48), char(instanceNum % 1000 / 100 + 48),
+        char dayNum[] = {char(instanceNum / 10000 + 48), char(instanceNum % 10000 / 1000 + 48), char(instanceNum % 1000 / 100 + 48),
                          char(instanceNum % 100 / 10 + 48), char(instanceNum % 10 + 48), '\0'};
         string fileName = "TrainingData/";
         fileName = fileName + dayNum + ".txt";

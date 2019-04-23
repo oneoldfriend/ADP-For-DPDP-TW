@@ -4,9 +4,9 @@
 #include "route.h"
 #include "util.h"
 #include <vector>
-#define STEPSIZE 0.1
-#define PARTITIONTHRESHOLD 0.5
-#define LOOKUPTABLEINITIAL 10.0
+#define STEP_SIZE 0.1
+#define PARTITION_THRESHOLD 0.5
+#define LOOKUP_TABLE_INITIAL 10.0
 
 class Aggregation
 {

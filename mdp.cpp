@@ -30,7 +30,7 @@ void MDP::integerToAction(int actionNum, State S, Action *a)
 void MDP::findBestAction(Action *a, ValueFunction valueFunction)
 {
     int actionNum = 0, maxActionNum = pow(2, this->currentState.newCustomers.size()), bestActionNum = -1;
-    double bestActionValue = MAXCOST;
+    double bestActionValue = MAX_COST;
     if (this->currentState.newCustomers.size() != 0)
     {
         //若有新顾客被观察到
@@ -140,7 +140,7 @@ double MDP::rejectionReward(Action a)
             count++;
         }
     }
-    return count * MAXWORKTIME;
+    return count * MAX_WORK_TIME;
 }
 
 void MDP::transition(Action a)
@@ -156,7 +156,7 @@ void MDP::transition(Action a)
             this->currentState.notServicedCustomer.push_back(iter->first->id);
         }
     }
-    double newDecisionTime = MAXWORKTIME;
+    double newDecisionTime = MAX_WORK_TIME;
     bool vehicleAllWaiting = true;
     for (auto iter = this->solution.routes.begin(); iter != this->solution.routes.end(); ++iter)
     {
@@ -195,7 +195,7 @@ void MDP::transition(Action a)
     }
     if (vehicleAllWaiting)
     {
-        this->currentState.currentTime = lastDecisionTime + TIMEUNIT;
+        this->currentState.currentTime = lastDecisionTime + UNIT_TIME;
     }
     else
     {

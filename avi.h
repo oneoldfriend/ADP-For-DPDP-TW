@@ -4,16 +4,17 @@
 #include <math.h>
 #include <fstream>
 
-#define MAXWORKTIME 720.0
-#define UNITTIME 1
+#define MAX_WORK_TIME 720.0
 #define CAPACITY 10
-#define PENALTYFACTOR 5
-#define MAXCOST 999999.0
-#define MAXEDGE 100.0
-#define CUSTOMERNUMBER 100
-#define MAXVEHICLE 10
-#define MAXSIMULATION 1000
-#define MAXINSTANCE 1
+#define PENALTY_FACTOR 5
+#define MAX_COST 999999.0
+#define MAX_EDGE 100.0
+#define UNIT_TIME 10
+#define CUSTOMER_NUMBER 100
+#define MAX_VEHICLE 10
+#define MAX_SIMULATION 10000
+#define MAX_TRAINING_INSTANCE 10000
+#define MAX_TEST_INSTANCE 100
 
 class AVI
 {

@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#define TIMEUNIT 10
 
 using namespace std;
 

@@ -2,12 +2,12 @@
 
 LookupTable::LookupTable()
 {
-    double initialValue = - MAXEDGE * double(CUSTOMERNUMBER);
-    double xTick = double(MAXWORKTIME) / double(LOOKUPTABLEINITIAL),
-    yTick = double(MAXWORKTIME) * double(MAXVEHICLE) / double(LOOKUPTABLEINITIAL);
-    for (int xCount = 0; xCount < LOOKUPTABLEINITIAL; xCount++)
+    double initialValue = - MAX_EDGE * double(CUSTOMER_NUMBER);
+    double xTick = double(MAX_WORK_TIME) / double(LOOKUP_TABLE_INITIAL),
+    yTick = double(MAX_WORK_TIME) * double(MAX_VEHICLE) / double(LOOKUP_TABLE_INITIAL);
+    for (int xCount = 0; xCount < LOOKUP_TABLE_INITIAL; xCount++)
     {
-        for (int yCount = 0; yCount < LOOKUPTABLEINITIAL; yCount++)
+        for (int yCount = 0; yCount < LOOKUP_TABLE_INITIAL; yCount++)
         {
             Entry newEntry;
             newEntry.x = xTick / 2.0 + double(xCount) * xTick;
@@ -54,7 +54,7 @@ void LookupTable::partitionUpdate()
         //计算N/\hat{N}和theta/\hat{theta}
         double factor1 = this->tableInfo[tableIter->first].first / averageN;
         double factor2 = entryTheta[tableIter->first] / averageTheta;
-        if (factor1 * factor2 > PARTITIONTHRESHOLD)
+        if (factor1 * factor2 > PARTITION_THRESHOLD)
         {
             //若该entry 达到threshold，则对entry 进行再划分
             this->partition(tableIter);
@@ -108,11 +108,11 @@ void Aggregation::aggregate(State S, Action a)
     {
         if (iter->head->next == iter->tail)
         {
-            this->remainTime += MAXWORKTIME - iter->head->departureTime;
+            this->remainTime += MAX_WORK_TIME - iter->head->departureTime;
         }
         else
         {
-            this->remainTime += MAXWORKTIME - iter->tail->departureTime;
+            this->remainTime += MAX_WORK_TIME - iter->tail->departureTime;
         }
     }
     tempSolution.solutionDelete();
@@ -152,7 +152,7 @@ void ValueFunction::updateValue(vector<pair<Aggregation, double> > valueAtThisSi
                 this->lookupTable.tableInfo[tableIter->first].first++;
                 this->lookupTable.tableInfo[tableIter->first].second.push_back(decisionPoint->second);
                 //更新value
-                tableIter->second = (1 - STEPSIZE) * tableIter->second + STEPSIZE * decisionPoint->second;
+                tableIter->second = (1 - STEP_SIZE) * tableIter->second + STEP_SIZE * decisionPoint->second;
                 break;
             }
         }

@@ -3,7 +3,7 @@
 
 Solution::Solution()
 {
-    for (int i = 0; i < MAXVEHICLE; i++)
+    for (int i = 0; i < MAX_VEHICLE; i++)
     {
         PointRoute route = new Route();
         this->routes.push_back(*route);
@@ -30,7 +30,7 @@ bool Solution::greedyInsertion(Action a)
         PointOrder dest = new Order(*customerIter, false);
         pair<PointOrder, PointOrder> bestOriginPos, bestDestPos;
         PointRoute bestRoute = nullptr;
-        double bestCost = MAXCOST;
+        double bestCost = MAX_COST;
         for (auto routeIter = this->routes.begin(); routeIter != this->routes.end(); ++routeIter)
         {
             double oldCost = bestCost;

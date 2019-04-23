@@ -166,7 +166,7 @@ bool Route::findBestPosition(PointOrder origin, PointOrder dest, double *bestCos
 bool Route::checkFeasibility()
 {
     //检查work time constraint 和capacity constraint
-    if (this->tail->departureTime > MAXWORKTIME)
+    if (this->tail->departureTime > MAX_WORK_TIME)
     {
         return false;
     }
@@ -209,7 +209,7 @@ double Route::calcCost()
             //若当前位置为顾客点，则查看是否迟到并进行相应惩罚
             if (p->arrivalTime > p->customer->endTime)
             {
-                penalty += p->customer->priority * PENALTYFACTOR * (p->arrivalTime - p->customer->endTime);
+                penalty += p->customer->priority * PENALTY_FACTOR * (p->arrivalTime - p->customer->endTime);
             }
             else
             {
