@@ -2,7 +2,7 @@
 
 LookupTable::LookupTable()
 {
-    double initialValue = MAXEDGE * double(CUSTOMERNUMBER);
+    double initialValue = - MAXEDGE * double(CUSTOMERNUMBER);
     double xTick = double(MAXWORKTIME) / double(LOOKUPTABLEINITIAL),
     yTick = double(MAXWORKTIME) * double(MAXVEHICLE) / double(LOOKUPTABLEINITIAL);
     for (int xCount = 0; xCount < LOOKUPTABLEINITIAL; xCount++)
