@@ -10,6 +10,8 @@
 
 using namespace std;
 
+class ValueFunction;
+
 class Action
 {
 public:
