@@ -63,7 +63,8 @@ void Generator::instanceGenenrator(double trainDayNum)
             }
         }
         generatedCustomers.sort(sortAscend);
-        char dayNum[] = {char(count / 10000 + 48), char(count % 10000 / 1000 + 48), char(count % 1000 / 100 + 48),
+        char dayNum[] = {char(count / 1000000 + 48), char(count % 1000000 / 100000 + 48), char(count % 100000 / 10000 + 48),
+                         char(count % 10000 / 1000 + 48), char(count % 1000 / 100 + 48),
                          char(count % 100 / 10 + 48), char(count % 10 + 48), '\0'};
         string fileName;
         if (trainDayNum == MAX_TEST_INSTANCE)

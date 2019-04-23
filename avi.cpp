@@ -14,7 +14,8 @@ void AVI::approximation(ValueFunction *valueFunction)
             instanceNum++;
         }
         instanceCount++;
-        char dayNum[] = {char(instanceNum / 10000 + 48), char(instanceNum % 10000 / 1000 + 48), char(instanceNum % 1000 / 100 + 48),
+        char dayNum[] = {char(instanceNum / 1000000 + 48), char(instanceNum % 1000000 / 100000 + 48), char(instanceNum % 100000 / 10000 + 48),
+                         char(instanceNum % 10000 / 1000 + 48), char(instanceNum % 1000 / 100 + 48),
                          char(instanceNum % 100 / 10 + 48), char(instanceNum % 10 + 48), '\0'};
         string fileName = "TrainingData/";
         fileName = fileName + dayNum + ".txt";
