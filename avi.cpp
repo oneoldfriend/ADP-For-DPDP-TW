@@ -9,13 +9,11 @@ void AVI::approximation(ValueFunction *valueFunction)
     {
         if (instanceCount == simulationPerInstance)
         {
-            instanceCount = 1;
+            //切换到下一个instance
+            instanceCount = 0;
             instanceNum++;
         }
-        else
-        {
-            instanceCount++;
-        }
+        instanceCount++;
         char dayNum[] = {char(instanceNum / 1000 + 48), char(instanceNum % 1000 / 100 + 48),
                          char(instanceNum % 100 / 10 + 48), char(instanceNum % 10 + 48), '\0'};
         string fileName = "TrainingData/";
