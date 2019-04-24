@@ -12,10 +12,13 @@ LookupTable::LookupTable()
             Entry newEntry;
             newEntry.x = xTick / 2.0 + double(xCount) * xTick;
             newEntry.y = yTick / 2.0 + double(yCount) * yTick;
-            newEntry.xRange = xTick;
-            newEntry.yRange = yTick;
+            newEntry.xRange = xTick / 2.0;
+            newEntry.yRange = yTick / 2.0;
             this->value[newEntry] = initialValue;
         }
+    }
+    for (auto iter = this->value.begin(); iter != this->value.end();++iter){
+        cout << iter->first.x << " " << iter->first.y << " " << iter->first.xRange << " " << iter->first.yRange << endl;
     }
 }
 
@@ -57,8 +60,12 @@ void LookupTable::partitionUpdate()
         if (factor1 * factor2 > PARTITION_THRESHOLD)
         {
             //若该entry 达到threshold，则对entry 进行再划分
+            //cout << "partitioned entry: " << tableIter->first.x << " " << tableIter->first.y << endl;
             this->partition(tableIter);
             this->value.erase(tableIter++);
+            for (auto iter = this->value.begin(); iter != this->value.end();++iter){
+                //cout << iter->first.x << " " << iter->first.y << endl;
+            }
         }
         else
         {
@@ -73,12 +80,20 @@ void LookupTable::partition(map<Entry, double>::iterator tableIter)
     Entry partition1, partition2, partition3, partition4;
     partition1.x = tableIter->first.x + tableIter->first.xRange / 2.0;
     partition1.y = tableIter->first.y + tableIter->first.yRange / 2.0;
+    partition1.xRange = tableIter->first.xRange / 2.0;
+    partition1.yRange = tableIter->first.yRange / 2.0;
     partition2.x = tableIter->first.x + tableIter->first.xRange / 2.0;
     partition2.y = tableIter->first.y - tableIter->first.yRange / 2.0;
+    partition2.xRange = tableIter->first.xRange / 2.0;
+    partition2.yRange = tableIter->first.yRange / 2.0;
     partition3.x = tableIter->first.x - tableIter->first.xRange / 2.0;
     partition3.y = tableIter->first.y - tableIter->first.yRange / 2.0;
+    partition3.xRange = tableIter->first.xRange / 2.0;
+    partition3.yRange = tableIter->first.yRange / 2.0;
     partition4.x = tableIter->first.x - tableIter->first.xRange / 2.0;
     partition4.y = tableIter->first.y + tableIter->first.yRange / 2.0;
+    partition4.xRange = tableIter->first.xRange / 2.0;
+    partition4.yRange = tableIter->first.yRange / 2.0;
     this->value[partition1] = tableIter->second;
     this->value[partition2] = tableIter->second;
     this->value[partition3] = tableIter->second;
@@ -140,6 +155,7 @@ void ValueFunction::updateValue(vector<pair<Aggregation, double> > valueAtThisSi
 {
     for (auto decisionPoint = valueAtThisSimulation.begin(); decisionPoint != valueAtThisSimulation.end(); ++decisionPoint)
     {
+        cout << "point: " << decisionPoint->first.currentTime << " " << decisionPoint->first.remainTime << endl;
         for (auto tableIter = this->lookupTable.value.begin(); tableIter != this->lookupTable.value.end(); ++tableIter)
         {
             //对这次simulation 所查询过的entry 对应的value 进行更新
@@ -148,8 +164,12 @@ void ValueFunction::updateValue(vector<pair<Aggregation, double> > valueAtThisSi
                 (decisionPoint->first.remainTime >= tableIter->first.y - tableIter->first.yRange &&
                  decisionPoint->first.remainTime < tableIter->first.y + tableIter->first.yRange))
             {
+                cout << "entry: " << tableIter->first.x << " " << tableIter->first.y << endl;
                 //记录该entry 的相关信息（被查找次数和更新的value）
                 this->lookupTable.tableInfo[tableIter->first].first++;
+                for (auto iter = this->lookupTable.tableInfo.begin(); iter != this->lookupTable.tableInfo.end();++iter){
+                    //cout << iter->first.x << " " << iter->first.y << " " << iter->second.first << endl;
+                }
                 this->lookupTable.tableInfo[tableIter->first].second.push_back(decisionPoint->second);
                 //更新value
                 tableIter->second = (1 - STEP_SIZE) * tableIter->second + STEP_SIZE * decisionPoint->second;
