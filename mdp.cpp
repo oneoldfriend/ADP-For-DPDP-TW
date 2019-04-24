@@ -95,6 +95,8 @@ MDP::MDP(string fileName)
         trainFile >> customer->priority;
         this->sequenceData.push_back(make_pair(appearTime, customer));
     }
+    auto last = this->sequenceData.rbegin();
+    delete last->second;
     this->sequenceData.pop_back();
     trainFile.close();
     this->currentState = State();
@@ -238,6 +240,7 @@ void MDP::observation(double lastDecisionTime)
             {
                 //若观察到顾客退单或催单，则直接对原有顾客信息进行更新
                 this->customers[sequenceIter->second->id]->priority = sequenceIter->second->priority;
+                delete sequenceIter->second;
             }
         }
         this->sequenceData.erase(sequenceIter++);
