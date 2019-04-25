@@ -4,7 +4,7 @@
 
 int main()
 {
-    //Generator::instanceGenenrator(MAX_TRAINING_INSTANCE);
+    //Generator::instanceGenenrator(MAX_TEST_INSTANCE);
     //return 0;
     Solver solver;
     solver.solve();

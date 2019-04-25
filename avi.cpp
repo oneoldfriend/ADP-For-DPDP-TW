@@ -3,7 +3,7 @@
 void AVI::approximation(ValueFunction *valueFunction)
 {
     //定义计数器，包括总模拟次数和每个instance的模拟次数
-    int totalSimulationCount = 0, instanceNum = 1, instanceCount = 0;
+     int totalSimulationCount = 0, instanceNum = 1, instanceCount = 0;
     int simulationPerInstance = MAX_SIMULATION / MAX_TRAINING_INSTANCE;
     while (totalSimulationCount++ < MAX_SIMULATION)
     {

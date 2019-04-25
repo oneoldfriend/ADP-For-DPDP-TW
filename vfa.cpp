@@ -3,7 +3,7 @@
 LookupTable::LookupTable()
 {
     double initialValue = - MAX_EDGE * double(CUSTOMER_NUMBER);
-    double xTick = double(MAX_WORK_TIME) / double(LOOKUP_TABLE_INITIAL),
+   double xTick = double(MAX_WORK_TIME) / double(LOOKUP_TABLE_INITIAL),
     yTick = double(MAX_WORK_TIME) * double(MAX_VEHICLE) / double(LOOKUP_TABLE_INITIAL);
     for (int xCount = 0; xCount < LOOKUP_TABLE_INITIAL; xCount++)
     {
@@ -18,7 +18,7 @@ LookupTable::LookupTable()
         }
     }
     for (auto iter = this->value.begin(); iter != this->value.end();++iter){
-        cout << iter->first.x << " " << iter->first.y << " " << iter->first.xRange << " " << iter->first.yRange << endl;
+        //cout << iter->first.x << " " << iter->first.y << " " << iter->first.xRange << " " << iter->first.yRange << endl;
     }
 }
 
@@ -155,7 +155,7 @@ void ValueFunction::updateValue(vector<pair<Aggregation, double> > valueAtThisSi
 {
     for (auto decisionPoint = valueAtThisSimulation.begin(); decisionPoint != valueAtThisSimulation.end(); ++decisionPoint)
     {
-        cout << "point: " << decisionPoint->first.currentTime << " " << decisionPoint->first.remainTime << endl;
+        //cout << "point: " << decisionPoint->first.currentTime << " " << decisionPoint->first.remainTime << endl;
         for (auto tableIter = this->lookupTable.value.begin(); tableIter != this->lookupTable.value.end(); ++tableIter)
         {
             //对这次simulation 所查询过的entry 对应的value 进行更新
@@ -164,7 +164,7 @@ void ValueFunction::updateValue(vector<pair<Aggregation, double> > valueAtThisSi
                 (decisionPoint->first.remainTime >= tableIter->first.y - tableIter->first.yRange &&
                  decisionPoint->first.remainTime < tableIter->first.y + tableIter->first.yRange))
             {
-                cout << "entry: " << tableIter->first.x << " " << tableIter->first.y << endl;
+                //cout << "entry: " << tableIter->first.x << " " << tableIter->first.y << endl;
                 //记录该entry 的相关信息（被查找次数和更新的value）
                 this->lookupTable.tableInfo[tableIter->first].first++;
                 for (auto iter = this->lookupTable.tableInfo.begin(); iter != this->lookupTable.tableInfo.end();++iter){
