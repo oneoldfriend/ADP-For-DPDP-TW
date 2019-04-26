@@ -3,10 +3,17 @@
 void AVI::approximation(ValueFunction *valueFunction)
 {
     //定义计数器，包括总模拟次数和每个instance的模拟次数
-     int totalSimulationCount = 0, instanceNum = 1, instanceCount = 0;
+    int totalSimulationCount = 0, instanceNum = 1, instanceCount = 0;
     int simulationPerInstance = MAX_SIMULATION / MAX_TRAINING_INSTANCE;
+    int lagApproximateCount = 0;
+    bool startApproximate = false;
     while (totalSimulationCount++ < MAX_SIMULATION)
     {
+        lagApproximateCount++;
+        if (lagApproximateCount > LAG_APPROXIMATE)
+        {
+            startApproximate = true;
+        }
         if (instanceCount == simulationPerInstance)
         {
             //切换到下一个instance
@@ -36,7 +43,7 @@ void AVI::approximation(ValueFunction *valueFunction)
             simulation.transition(bestAction);
         }
         //对lookup table 进行更新
-        valueFunction->updateValue(valueAtThisSimulation);
+        valueFunction->updateValue(valueAtThisSimulation, startApproximate);
         cout << totalSimulationCount << " " << simulation.solution.cost << endl;
         for (auto iter = simulation.customers.begin(); iter != simulation.customers.end(); ++iter)
         {

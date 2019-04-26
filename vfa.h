@@ -52,6 +52,6 @@ class ValueFunction
 public:
   LookupTable lookupTable;
   double getValue(Aggregation postDecisionState, double reward);
-  void updateValue(vector<pair<Aggregation, double> > valueAtThisSimulation);
+  void updateValue(vector<pair<Aggregation, double> > valueAtThisSimulation, bool startApproximate);
   ValueFunction();
 };

@@ -2,9 +2,9 @@
 
 LookupTable::LookupTable()
 {
-    double initialValue = - MAX_EDGE * double(CUSTOMER_NUMBER);
-   double xTick = double(MAX_WORK_TIME) / double(LOOKUP_TABLE_INITIAL),
-    yTick = double(MAX_WORK_TIME) * double(MAX_VEHICLE) / double(LOOKUP_TABLE_INITIAL);
+    double initialValue = -MAX_EDGE * double(CUSTOMER_NUMBER);
+    double xTick = double(MAX_WORK_TIME) / double(LOOKUP_TABLE_INITIAL),
+           yTick = double(MAX_WORK_TIME) * double(MAX_VEHICLE) / double(LOOKUP_TABLE_INITIAL);
     for (int xCount = 0; xCount < LOOKUP_TABLE_INITIAL; xCount++)
     {
         for (int yCount = 0; yCount < LOOKUP_TABLE_INITIAL; yCount++)
@@ -17,7 +17,8 @@ LookupTable::LookupTable()
             this->value[newEntry] = initialValue;
         }
     }
-    for (auto iter = this->value.begin(); iter != this->value.end();++iter){
+    for (auto iter = this->value.begin(); iter != this->value.end(); ++iter)
+    {
         //cout << iter->first.x << " " << iter->first.y << " " << iter->first.xRange << " " << iter->first.yRange << endl;
     }
 }
@@ -63,7 +64,8 @@ void LookupTable::partitionUpdate()
             //cout << "partitioned entry: " << tableIter->first.x << " " << tableIter->first.y << endl;
             this->partition(tableIter);
             this->value.erase(tableIter++);
-            for (auto iter = this->value.begin(); iter != this->value.end();++iter){
+            for (auto iter = this->value.begin(); iter != this->value.end(); ++iter)
+            {
                 //cout << iter->first.x << " " << iter->first.y << endl;
             }
         }
@@ -151,7 +153,7 @@ double ValueFunction::getValue(Aggregation postDecisionState, double reward)
     return this->lookupTable.lookup(postDecisionState);
 }
 
-void ValueFunction::updateValue(vector<pair<Aggregation, double> > valueAtThisSimulation)
+void ValueFunction::updateValue(vector<pair<Aggregation, double> > valueAtThisSimulation, bool startApproximate)
 {
     for (auto decisionPoint = valueAtThisSimulation.begin(); decisionPoint != valueAtThisSimulation.end(); ++decisionPoint)
     {
@@ -167,12 +169,16 @@ void ValueFunction::updateValue(vector<pair<Aggregation, double> > valueAtThisSi
                 //cout << "entry: " << tableIter->first.x << " " << tableIter->first.y << endl;
                 //记录该entry 的相关信息（被查找次数和更新的value）
                 this->lookupTable.tableInfo[tableIter->first].first++;
-                for (auto iter = this->lookupTable.tableInfo.begin(); iter != this->lookupTable.tableInfo.end();++iter){
+                for (auto iter = this->lookupTable.tableInfo.begin(); iter != this->lookupTable.tableInfo.end(); ++iter)
+                {
                     //cout << iter->first.x << " " << iter->first.y << " " << iter->second.first << endl;
                 }
                 this->lookupTable.tableInfo[tableIter->first].second.push_back(decisionPoint->second);
                 //更新value
-                tableIter->second = (1 - STEP_SIZE) * tableIter->second + STEP_SIZE * decisionPoint->second;
+                if (startApproximate)
+                {
+                    tableIter->second = (1 - STEP_SIZE) * tableIter->second + STEP_SIZE * decisionPoint->second;
+                }
                 break;
             }
         }
