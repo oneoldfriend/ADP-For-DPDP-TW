@@ -26,13 +26,10 @@ void Solver::solve()
         {
             Action bestAction;
             simulation.findBestAction(&bestAction, valueFunction);
-            Aggregation postDecisionState;
-            //计算后决策状态以及聚合后的相关信息
-            postDecisionState.aggregate(simulation.currentState, bestAction);
             //状态转移
             simulation.transition(bestAction);
         }
-        testResult.push_back(simulation.solution.cost);
+        testResult.push_back(simulation.solution.cost + simulation.cumRejectionReward);
     }
     double resultSum = 0;
     for (auto iter = testResult.begin(); iter != testResult.end(); ++iter)

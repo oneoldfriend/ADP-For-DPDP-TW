@@ -3,6 +3,21 @@
 
 using namespace std;
 
+
+double Action::rejectionReward()
+{
+    double count = 0;
+    for (auto iter = this->customerConfirmation.begin(); iter != this->customerConfirmation.end(); ++iter)
+    {
+        if (iter->second == false)
+        {
+            count++;
+        }
+    }
+    return count * MAX_WORK_TIME;
+}
+
+
 State::State()
 {
     this->currentTime = 0;
@@ -69,7 +84,7 @@ bool MDP::checkActionFeasibility(Action a, double *reward)
     bool feasibility = tempSolution.greedyInsertion(a);
     double newCost = tempSolution.cost;
     tempSolution.solutionDelete();
-    newCost += this->rejectionReward(a);
+    newCost += a.rejectionReward();
     *reward = newCost - currentCost;
     return feasibility;
 }
@@ -117,6 +132,7 @@ MDP::MDP(string fileName)
     }
     this->solution.greedyInsertion(a);
     this->currentState.pointSolution = &this->solution;
+    this->cumRejectionReward = 0.0;
 }
 
 double MDP::reward(State S, Action a)
@@ -128,27 +144,15 @@ double MDP::reward(State S, Action a)
     tempSolution.greedyInsertion(a);
     double newCost = tempSolution.cost;
     tempSolution.solutionDelete();
-    newCost += this->rejectionReward(a);
+    newCost += a.rejectionReward();
     return newCost - currentCost;
-}
-
-double MDP::rejectionReward(Action a)
-{
-    double count = 0;
-    for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)
-    {
-        if (iter->second == false)
-        {
-            count++;
-        }
-    }
-    return count * MAX_WORK_TIME;
 }
 
 void MDP::transition(Action a)
 {
     //执行动作
     double lastDecisionTime = this->currentState.currentTime;
+    this->cumRejectionReward += a.rejectionReward();
     this->solution.greedyInsertion(a);
     //更新当前状态
     for (auto iter = a.customerConfirmation.begin(); iter != a.customerConfirmation.end(); ++iter)

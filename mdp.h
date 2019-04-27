@@ -15,7 +15,7 @@ class Action
 {
 public:
   map<Customer *, bool> customerConfirmation;
-  bool movement;
+  double rejectionReward();
 };
 
 class State
@@ -32,6 +32,7 @@ class MDP
 {
 public:
   Solution solution;
+  double cumRejectionReward;
   State currentState;
   list<pair<double, Customer *> > sequenceData;
   map<string, Customer*> customers;
@@ -40,7 +41,6 @@ public:
   void integerToAction(int actionNum, State S, Action *a);
   void transition(Action a);
   double reward(State S, Action a);
-  double rejectionReward(Action a);
   void observation(double lastDecisionTime);
   MDP(string fileName);
 };
