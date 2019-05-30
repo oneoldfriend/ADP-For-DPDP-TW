@@ -204,17 +204,14 @@ double Route::calcCost()
     PointOrder p = this->head;
     while (p != this->tail)
     {
-        if (!p->isOrigin)
+        //若当前位置为顾客点，则查看是否迟到并进行相应惩罚
+        if (p->arrivalTime > p->customer->endTime)
         {
-            //若当前位置为顾客点，则查看是否迟到并进行相应惩罚
-            if (p->arrivalTime > p->customer->endTime)
-            {
-                penalty += p->customer->priority * PENALTY_FACTOR * (p->arrivalTime - p->customer->endTime);
-            }
-            else
-            {
-                waitTime += p->waitTime;
-            }
+            penalty += p->customer->priority * PENALTY_FACTOR * (p->arrivalTime - p->customer->endTime);
+        }
+        else
+        {
+            waitTime += p->waitTime;
         }
         //计算路程开销
         if (p->next != nullptr)
