@@ -15,20 +15,20 @@ void Solver::solve()
     return;*/
 
     ValueFunction valueFunction;
-    cout << "starting approximation!\n"
-         << endl;
     //offline approximation
     AVI approximateValueIterate;
     if (!MYOPIC)
     {
+        cout << "starting approximation!\n"
+             << endl;
         approximateValueIterate.approximation(&valueFunction);
+        cout << "finished approximation!\n"
+             << endl;
     }
-    cout << "finished approximation!\n"
-         << endl;
     
     //online solving
     int instanceNum = 0;
-    vector<double> testResult;
+    vector<double> testResult, rejection;
     while (instanceNum++ < MAX_TEST_INSTANCE)
     {
        char dayNum[] = {char(instanceNum / 1000000 + 48), char(instanceNum % 1000000 / 100000 + 48), char(instanceNum % 100000 / 10000 + 48),
@@ -45,12 +45,17 @@ void Solver::solve()
             simulation.transition(bestAction);
         }
         testResult.push_back(simulation.solution.cost + simulation.cumRejectionReward);
+        rejection.push_back(simulation.cumRejectionReward);
     }
-    double resultSum = 0;
+    double resultSum = 0, rejectionSum = 0;
     for (auto iter = testResult.begin(); iter != testResult.end(); ++iter)
     {
         resultSum += *iter;
     }
-    cout << "Test Average Cost: " << resultSum / double(testResult.size()) << endl;
+    for (auto iter = rejection.begin(); iter != rejection.end(); ++iter)
+    {
+        rejectionSum += *iter;
+    }
+    cout << "Test Average Cost: " << resultSum / double(testResult.size()) << " " << rejectionSum / double(rejection.size()) << endl;
     return;
 }

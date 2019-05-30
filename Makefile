@@ -1,5 +1,5 @@
 # The pre-processor and compiler options.   
-MY_CFLAGS =  
+MY_CFLAGS =  -std=c++17
   
 # The linker options.  
 MY_LIBS   =  
